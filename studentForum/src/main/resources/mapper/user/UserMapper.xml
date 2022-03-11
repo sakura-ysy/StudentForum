@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.backend.module.user.mapper.UserMapper">
+    <select id="getPermissionByUsername" resultType="com.example.backend.module.user.entity.Permission">
+            select permission.* from ums_user
+            inner join user_role user_role
+            on ums_user.id = user_role.user_id
+            inner join role_permission on user_role.role_id = role_permission.role_id
+            inner join  permission on role_permission.perm_id = permission.id where ums_user.username = #{userName};
+    </select>
+</mapper>

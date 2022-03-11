@@ -1,0 +1,7 @@
+spring:
+  profiles:
+    active: dev
+
+jwt:
+  tokenHeader: Authorization
+  secret: forum-is-secret

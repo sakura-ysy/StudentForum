@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.backend.module.notify.mapper.NotifyMapper">
+    <!-- 结构集映射，column是数据库中的列名，property是Java实体类中的字段名 -->
+    <resultMap id="notify" type="com.example.backend.module.notify.entity.Notify">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="user_id" property="userId"/>
+        <result column="from_id" property="fromId"/>
+        <result column="action" property="action"/>
+        <result column="is_Read" property="isRead"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="getNotifyByUserId" resultMap="notify">
+        select notify.*,ums_user.username
+        from notify
+                 join ums_user on ums_user.id = notify.user_id
+        where (user_id = #{userId})
+        order by is_Read asc, create_time desc
+    </select>
+
+    <select id="getPraiseNotifyByUserId" resultMap="notify">
+        select notify.*,ums_user.username
+        from notify
+                 join ums_user on ums_user.id = notify.user_id
+        where user_id = #{userId} and action = 1
+        order by is_Read asc, create_time desc
+    </select>
+
+    <select id="getCommentNotifyByUserId" resultMap="notify">
+        select notify.*,ums_user.username
+        from notify
+                 join ums_user on ums_user.id = notify.user_id
+        where user_id = #{userId} and action = 2
+        order by is_Read asc, create_time desc
+    </select>
+
+    <select id="getCollectNotifyByUserId" resultMap="notify">
+        select notify.*,ums_user.username
+        from notify
+                 join ums_user on ums_user.id = notify.user_id
+        where user_id = #{userId} and action = 3
+        order by is_Read asc, create_time desc
+    </select>
+
+    <select id="getReplyNotifyByUserId" resultMap="notify">
+        select notify.*,ums_user.username
+        from notify
+                 join ums_user on ums_user.id = notify.user_id
+        where user_id = #{userId} and action = 4
+        order by is_Read asc, create_time desc
+    </select>
+
+    <select id="getFollowNotifyByUserId" resultMap="notify">
+        select notify.*,ums_user.username
+        from notify
+                 join ums_user on ums_user.id = notify.user_id
+        where user_id = #{userId} and action = 5
+        order by is_Read asc, create_time desc
+    </select>
+
+</mapper>

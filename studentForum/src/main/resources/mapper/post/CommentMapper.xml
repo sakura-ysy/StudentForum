@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.backend.module.post.mapper.CommentMapper">
+    <!-- 结构集映射，column是数据库中的列名，property是Java实体类中的字段名 -->
+    <resultMap id="topicVO" type="com.example.backend.module.post.entity.CommentVO">
+        <id column="id" property="id"/>
+        <result column="content" property="content"/>
+        <result column="user_id" property="userId"/>
+        <result column="topic_id" property="topicId"/>
+        <result column="username" property="username"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <select id="getCommentsByTopicID" resultMap="topicVO">
+        select *
+        from bms_comment
+        where (topic_id = #{topicid}) and (parent_comment_id is null) and(is_pass = true )
+        order by create_time desc
+    </select>
+
+
+    <select id="getSecondLevelCommentsByParentID" resultMap="topicVO">
+        select bms_comment.*,ums_user.username
+        from bms_comment
+                 join ums_user on ums_user.id = bms_comment.user_id
+        where (topic_id = #{topicId}) and (parent_comment_id = #{parentId})
+        order by create_time desc
+    </select>
+</mapper>
