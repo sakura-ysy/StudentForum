@@ -221,6 +221,8 @@ public class UserController {
     public ApiResult<List<Post>> getAllCollections(){
         User user = AuthInterceptor.getCurrentUser();
         List<PostCollect> list = postCollectMapper.selectList(new LambdaQueryWrapper<PostCollect>().eq(PostCollect::getUserId, user.getId()));
+        if (list==null)
+            return ApiResult.success(null);
         List<Post> postList = new ArrayList<>();
         for (PostCollect postCollect : list) {
             String postId = postCollect.getPostId();
