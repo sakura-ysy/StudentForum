@@ -16,14 +16,19 @@ import com.example.backend.module.post.service.IPostCollectService;
 import com.example.backend.module.post.service.IPostPraiseService;
 import com.example.backend.module.user.entity.User;
 import com.example.backend.module.user.service.IUserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 
+@Api(tags = "用户-帖子交互相关接口")
 @RestController
-@RequestMapping("/react")
+@RequestMapping("/api/react")
 public class UserPostReactController {
 
     @Resource
@@ -46,8 +51,10 @@ public class UserPostReactController {
      * @param postId
      * @return
      */
-    @GetMapping("/comment/getI")
-    public ApiResult<List<CommentVO>> getCommentsByTopicID(@RequestParam(value = "topicid") String postId) {
+    @ApiOperation("获取帖子的一级评论")
+    @GetMapping("/comment/getI/{postId}")
+    public ApiResult<List<CommentVO>> getCommentsByTopicID(
+            @ApiParam("帖子id") @PathVariable("postId") String postId) {
         List<CommentVO> lstBmsComment = bmsCommentService.getFirstLevelCommentsByTopicID(postId);
         return ApiResult.success(lstBmsComment);
     }
@@ -58,6 +65,7 @@ public class UserPostReactController {
      * @param dto
      * @return
      */
+    @ApiOperation("发布一级评论")
     @OperLog(operModul = "123", operType = "get", operDesc = "123")
     @LoginRequired(allowAll = true)
     @PostMapping("/comment/addI")
@@ -74,14 +82,17 @@ public class UserPostReactController {
 
     /**
      * 获取二级评论
+     * @param postId
      * @param parentId
      * @return
      */
-    @GetMapping("/comment/getII")
-    public ApiResult<List<CommentVO>> getCommentsByParentID(@RequestParam(value = "topicId") String topicId,
-                                                            @RequestParam(value = "parentId") String parentId) {
+    @ApiOperation("获取二级评论")
+    @GetMapping("/comment/getII/{postId}/{parentId}")
+    public ApiResult<List<CommentVO>> getCommentsByParentID(
+            @ApiParam("帖子id") @PathVariable("postId") String postId,
+            @ApiParam("父评论id") @PathVariable("parentId") String parentId) {
         System.out.println(parentId);
-        List<CommentVO> lstBmsComment = bmsCommentService.getSecondLevelCommentsByParentID(topicId, parentId);
+        List<CommentVO> lstBmsComment = bmsCommentService.getSecondLevelCommentsByParentID(postId, parentId);
         return ApiResult.success(lstBmsComment);
     }
 
@@ -90,6 +101,7 @@ public class UserPostReactController {
      * @param dto
      * @return
      */
+    @ApiOperation("发布二级评论")
     @LoginRequired(allowAll = true)
     @PostMapping("/comment/addII")
     public ApiResult<Comment> addSecondComment(@RequestBody CommentDTO dto) {
@@ -109,12 +121,15 @@ public class UserPostReactController {
 
     /**
      * 点赞
-     * @param id
+     * @param map
      * @return
      */
+    @ApiOperation("点赞")
     @LoginRequired(allowAll = true)
     @RequestMapping(value = "/praise",method = RequestMethod.POST)
-    public ApiResult<String> praise(@RequestParam("id") String id){
+    public ApiResult<String> praise(
+            @ApiParam("帖子id, 仅需传入postId字段")@RequestBody Map<String,String> map){
+        String id = map.get("postId");
         User user = AuthInterceptor.getCurrentUser();
         Integer statusCode = iPostPraiseService.executePraise(id,user.getUsername());
         switch (statusCode){
@@ -133,12 +148,15 @@ public class UserPostReactController {
 
     /**
      * 取消点赞
-     * @param id
+     * @param map
      * @return
      */
+    @ApiOperation("取消点赞")
     @LoginRequired(allowAll = true)
     @RequestMapping(value = "/unpraise",method = RequestMethod.POST)
-    public ApiResult<String> unPraise(@RequestParam("id") String id){
+    public ApiResult<String> unPraise(
+            @ApiParam("帖子id, 仅需传入postId字段")@RequestBody Map<String,String> map){
+        String id = map.get("postId");
         User user = AuthInterceptor.getCurrentUser();
         Integer statusCode = iPostPraiseService.executeUnPraise(id,user.getUsername());
         switch (statusCode){
@@ -159,12 +177,15 @@ public class UserPostReactController {
 
     /**
      * 收藏
-     * @param id
+     * @param map
      * @return
      */
+    @ApiOperation("收藏")
     @LoginRequired(allowAll = true)
     @RequestMapping(value = "/collect",method = RequestMethod.POST)
-    public ApiResult<String> collect(@RequestParam("id") String id){
+    public ApiResult<String> collect(
+            @ApiParam("帖子id, 仅需传入postId字段")@RequestBody Map<String,String> map){
+        String id = map.get("postId");
         User user = AuthInterceptor.getCurrentUser();
         Integer statusCode = iPostCollectService.executeCollect(id,user.getUsername());
         switch (statusCode){
@@ -182,13 +203,16 @@ public class UserPostReactController {
 
     /**
      * 取消收藏
-     * @param id
+     * @param map
      * @return
      */
+    @ApiOperation("取消收藏")
     @LoginRequired(allowAll = true)
     @RequestMapping(value = "/uncollect",method = RequestMethod.POST)
-    public ApiResult<String> unCollect(@RequestParam("id") String id){
+    public ApiResult<String> unCollect(
+            @ApiParam("帖子id, 仅需传入postId字段")@RequestBody Map<String,String> map){
         User user = AuthInterceptor.getCurrentUser();
+        String id = map.get("postId");
         Integer statusCode = iPostCollectService.executeUnCollect(id,user.getUsername());
         switch (statusCode){
             case -1:
@@ -207,12 +231,15 @@ public class UserPostReactController {
 
     /**
      * 用户是否点赞
-     * @param id
+     * @param map
      * @return
      */
+    @ApiOperation("判断用户是否点赞")
     @LoginRequired(allowAll = true)
-    @RequestMapping("/ispraise")
-    public ApiResult<Boolean> isPraise(@RequestParam("id") String id){
+    @RequestMapping(value = "/ispraise",method = RequestMethod.GET)
+    public ApiResult<Boolean> isPraise(
+            @ApiParam("帖子id, 仅需传入postId字段")@RequestBody Map<String,String> map){
+        String id = map.get("postId");
         User user = AuthInterceptor.getCurrentUser();
         PostPraise postPraise = iPostPraiseService.getBaseMapper().selectOne(new LambdaQueryWrapper<PostPraise>().eq(PostPraise::getUserId, user.getId()).eq(PostPraise::getPostId, id));
         if (ObjectUtils.isEmpty(postPraise)){
@@ -223,12 +250,15 @@ public class UserPostReactController {
 
     /**
      * 用户是否收藏
-     * @param id
+     * @param map
      * @return
      */
+    @ApiOperation("判断用户是否收藏")
     @LoginRequired(allowAll = true)
-    @RequestMapping("/iscollect")
-    public ApiResult<Boolean> isCollect(@RequestParam("id") String id){
+    @RequestMapping(value = "/iscollect",method = RequestMethod.GET)
+    public ApiResult<Boolean> isCollect(
+            @ApiParam("帖子id, 仅需传入postId字段")@RequestBody Map<String,String> map){
+        String id = map.get("postId");
         User user = AuthInterceptor.getCurrentUser();
         PostCollect postCollect = iPostCollectService.getBaseMapper().selectOne(new LambdaQueryWrapper<PostCollect>().eq(PostCollect::getUserId, user.getId()).eq(PostCollect::getPostId, id));
         if (ObjectUtils.isEmpty(postCollect)){

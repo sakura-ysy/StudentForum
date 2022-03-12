@@ -9,21 +9,25 @@ import com.example.backend.module.teacher.entity.Teacher;
 import com.example.backend.module.teacher.mapper.TeacherMapper;
 import com.example.backend.module.user.entity.User;
 import com.example.backend.module.user.service.impl.IUserServiceImpl;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
+@Api(tags = "只允许教师访问的接口")
 @RestController
-@RequestMapping("/teacher")
+@RequestMapping("/api/teacher")
 public class TeacherController {
     @Resource
     private TeacherMapper teacherMapper;
     @Resource
     private IUserServiceImpl iUserService;
 
+    @ApiOperation("获取该教师的信息")
     @LoginRequired(allowTeacher = true)
-    @RequestMapping("/info")
+    @GetMapping(value = "/info")
     public ApiResult<Teacher> getTeacherInfo(){
         User user = AuthInterceptor.getCurrentUser();
         Teacher teacher = teacherMapper.selectOne(new LambdaQueryWrapper<Teacher>().eq(Teacher::getUserName, user.getUsername()));
@@ -33,6 +37,7 @@ public class TeacherController {
         return ApiResult.success(teacher);
     }
 
+    @ApiOperation("更新该教师信息")
     @LoginRequired(allowTeacher = true)
     @RequestMapping(value = "/update",method = RequestMethod.POST)
     public ApiResult<Teacher> updateTeacherInfo(@RequestBody Teacher teacher){

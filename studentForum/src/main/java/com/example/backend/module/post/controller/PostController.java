@@ -18,6 +18,9 @@ import com.example.backend.module.post.vo.PostVO;
 import com.example.backend.module.user.entity.User;
 import com.example.backend.module.user.service.IUserService;
 import com.vdurmont.emoji.EmojiParser;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +31,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@Api(tags = "帖子相关接口")
 @RestController
-@RequestMapping("/post")
+@RequestMapping("/api/post")
 public class PostController {
 
     @Resource
@@ -48,17 +52,15 @@ public class PostController {
 
     /**
      * 返回所有帖子
-     * @param tab
      * @param pageNo
      * @param pageSize
      * @return
      */
-    @LoginRequired(allowCommon = true)
-    @GetMapping("/list")
-    public ApiResult<Page<PostVO>> list(@RequestParam(value = "tab", defaultValue = "latest") String tab,
-                                        @RequestParam(value = "pageNo", defaultValue = "1")  Integer pageNo,
-                                        @RequestParam(value = "size", defaultValue = "10") Integer pageSize) {
-        Page<PostVO> list = iPostService.getList(new Page<>(pageNo, pageSize), tab);
+    @ApiOperation("分页获取帖子列表")
+    @GetMapping("/list/{pageNo}/{size}")
+    public ApiResult<Page<PostVO>> list(@PathVariable("pageNo")  Integer pageNo,
+                                        @PathVariable("size")  Integer pageSize) {
+        Page<PostVO> list = iPostService.getList(new Page<>(pageNo, pageSize), "latest");
         // Page<> 是自带的有关处理分页的类
         return ApiResult.success(list);
     }
@@ -69,6 +71,7 @@ public class PostController {
      * @param dto
      * @return
      */
+    @ApiOperation("发布帖子")
     @LoginRequired(allowAll = true)
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public ApiResult<Post> create(@RequestBody CreateTopicDTO dto) {
@@ -83,8 +86,10 @@ public class PostController {
      * @param id
      * @return
      */
-    @GetMapping()
-    public ApiResult<Map<String, Object>> view(@RequestParam("id") String id) {
+    @ApiOperation("获取帖子详情，id检索")
+    @GetMapping("/{id}")
+    public ApiResult<Map<String, Object>> view(
+            @ApiParam("帖子id") @PathVariable("id") String id) {
         Map<String, Object> map = iPostService.viewTopic(id);
         return ApiResult.success(map);
     }
@@ -92,12 +97,14 @@ public class PostController {
 
     /**
      * 随机返回10篇帖子(排除当前帖子)，用于推荐
-     * @param id
+     * @param postId
      * @return
      */
-    @GetMapping("/recommend")
-    public ApiResult<List<Post>> getRecommend(@RequestParam("topicId") String id){
-        List<Post> topics = iPostService.getRecommend(id);
+    @ApiOperation("随机返回10篇帖子用于推荐")
+    @GetMapping("/recommend/{id}")
+    public ApiResult<List<Post>> getRecommend(
+            @ApiParam("当前帖子id")@PathVariable("id") String postId){
+        List<Post> topics = iPostService.getRecommend(postId);
         return ApiResult.success(topics) ;
     }
 
@@ -106,6 +113,7 @@ public class PostController {
      * @param post
      * @return
      */
+    @ApiOperation("编辑帖子")
     @LoginRequired(allowAll = true)
     @PostMapping("/update")
     public ApiResult<Post> update(@Valid @RequestBody Post post) {
@@ -124,9 +132,11 @@ public class PostController {
      * @param id
      * @return
      */
+    @ApiOperation("删除帖子")
     @LoginRequired(allowAll = true)
     @DeleteMapping("/delete/{id}")
-    public ApiResult<String> delete(@PathVariable("id") String id) {
+    public ApiResult<String> delete(
+            @ApiParam("帖子id") @PathVariable("id") String id) {
         User user = AuthInterceptor.getCurrentUser();
         Post byId = iPostService.getById(id);
         Assert.notNull(byId, "来晚一步，话题已不存在");
@@ -142,8 +152,10 @@ public class PostController {
      * @param postId
      * @return
      */
-    @RequestMapping(value = "/praise/num",method = RequestMethod.GET)
-    public ApiResult<Integer> praiseNumber(@RequestParam("id") String postId){
+    @ApiOperation("获取点赞数")
+    @GetMapping(value = "/praise/num/{id}")
+    public ApiResult<Integer> praiseNumber(
+            @ApiParam("帖子id")@PathVariable("id") String postId){
         Post post = topicMapper.selectById(postId);
         if (ObjectUtils.isEmpty(post))
             return ApiResult.failed("帖子不存在");
@@ -156,8 +168,10 @@ public class PostController {
      * @param postId
      * @return
      */
-    @RequestMapping(value = "/collect/num",method = RequestMethod.GET)
-    public ApiResult<Integer> collectNumber(@RequestParam("id") String postId){
+    @ApiOperation("获取收藏数")
+    @GetMapping(value = "/collect/num/{id}")
+    public ApiResult<Integer> collectNumber(
+            @ApiParam("帖子id")@PathVariable("id") String postId){
         Post post = topicMapper.selectById(postId);
         if (ObjectUtils.isEmpty(post))
             return ApiResult.failed("帖子不存在");
@@ -165,4 +179,12 @@ public class PostController {
         return ApiResult.success(list.size());
     }
 
+    @ApiOperation("关键词搜索, 分页返回帖子列表")
+    @GetMapping("/search/list/{keyword}/{pageNo}/{size}")
+    public ApiResult<Page<PostVO>> searchList(@PathVariable("keyword") String keyword,
+                                              @PathVariable("pageNo") Integer pageNum,
+                                              @RequestParam("size") Integer pageSize) {
+        Page<PostVO> results = iPostService.searchByKey(keyword, new Page<>(pageNum, pageSize));
+        return ApiResult.success(results);
+    }
 }

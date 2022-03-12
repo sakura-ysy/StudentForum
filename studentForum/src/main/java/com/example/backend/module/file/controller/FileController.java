@@ -17,10 +17,9 @@ import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -30,14 +29,16 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Api(tags = "文件相关接口")
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/api/file")
 public class FileController {
     @Resource
     private IUserService iUserService;
     @Resource
     private FileUserMapper fileUserMapper;
 
+    @ApiOperation("上传文件")
     @LoginRequired(allowAll = true)
     @PostMapping("/upload")
     public ApiResult<List<String>> fileUpload(MultipartFile[] file) throws IOException {
@@ -94,8 +95,9 @@ public class FileController {
         return ApiResult.success(list,"上传成功");
     }
 
+    @ApiOperation("获取当前用户上传的全部文件URL")
     @LoginRequired(allowAll = true)
-    @RequestMapping("/list")
+    @GetMapping(value = "/list")
     public ApiResult<List<String>> getFilesOfUser(){
         User user = AuthInterceptor.getCurrentUser();
         List<FileUser> fileList = fileUserMapper.selectList(new LambdaQueryWrapper<FileUser>().eq(FileUser::getUsername, user.getUsername()));

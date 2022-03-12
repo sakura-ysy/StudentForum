@@ -9,21 +9,25 @@ import com.example.backend.module.company.entity.Company;
 import com.example.backend.module.company.mapper.CompanyMapper;
 import com.example.backend.module.user.entity.User;
 import com.example.backend.module.user.service.impl.IUserServiceImpl;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
+@Api(tags = "只允许企业能访问的接口")
 @RestController
-@RequestMapping("/company")
+@RequestMapping("/api/company")
 public class CompanyController {
     @Resource
     private CompanyMapper companyMapper;
     @Resource
     private IUserServiceImpl iUserService;
 
+    @ApiOperation("获取该企业信息")
     @LoginRequired(allowAll = true)
-    @RequestMapping("/info")
+    @GetMapping(value = "/info")
     public ApiResult<Company> getCompanyInfo(){
         User user = AuthInterceptor.getCurrentUser();
         Company company = companyMapper.selectOne(new LambdaQueryWrapper<Company>().eq(Company::getUserName, user.getUsername()));
@@ -33,6 +37,7 @@ public class CompanyController {
         return ApiResult.success(company);
     }
 
+    @ApiOperation("更新企业信息")
     @LoginRequired(allowAll = true)
     @RequestMapping(value = "/update",method = RequestMethod.POST)
     public ApiResult<Company> updateCompanyInfo(@RequestBody Company company){

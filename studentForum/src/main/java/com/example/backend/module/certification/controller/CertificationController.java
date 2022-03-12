@@ -23,6 +23,7 @@ import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
+import io.swagger.annotations.Api;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -36,8 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+@Api(tags = "认证相关接口, 只是个模拟, 先不用")
 @RestController
-@RequestMapping("/certification")
+@RequestMapping("/api/certification")
 public class CertificationController {
     @Resource
     private ICertificationService iCertificationService;
@@ -52,16 +54,14 @@ public class CertificationController {
 
     /**
      * 返回所有认证需求
-     * @param tab
      * @param pageNo
      * @param pageSize
      * @return
      */
-    @GetMapping("/list")
-    public ApiResult<Page<CertificationVO>> list(@RequestParam(value = "tab", defaultValue = "latest") String tab,
-                                               @RequestParam(value = "pageNo", defaultValue = "1")  Integer pageNo,
-                                               @RequestParam(value = "size", defaultValue = "10") Integer pageSize) {
-        Page<CertificationVO> list = iCertificationService.getList(new Page<>(pageNo, pageSize), tab);
+    @GetMapping("/list/{pageNo}/{size}")
+    public ApiResult<Page<CertificationVO>> list(@PathVariable(value = "pageNo",required = false)  Integer pageNo,
+                                               @PathVariable(value = "size",required = false) Integer pageSize) {
+        Page<CertificationVO> list = iCertificationService.getList(new Page<>(pageNo, pageSize), "latest");
         // Page<> 是自带的有关处理分页的类
         return ApiResult.success(list);
     }
@@ -128,8 +128,9 @@ public class CertificationController {
      * @param id
      * @return
      */
-    @GetMapping()
-    public ApiResult<Map<String, Object>> view(@RequestParam("id") String id) {
+    @LoginRequired(allowAll = true)
+    @GetMapping("/{id}")
+    public ApiResult<Map<String, Object>> view(@PathVariable("id") String id) {
         Map<String, Object> map = iCertificationService.viewCertification(id);
         return ApiResult.success(map);
     }
@@ -140,8 +141,8 @@ public class CertificationController {
      * @return 是否成功
      */
     @LoginRequired(allowAll = true)
-    @DeleteMapping("/delete")
-    public ApiResult<String> delete(@RequestParam("id") String id) {
+    @DeleteMapping("/delete/{id}")
+    public ApiResult<String> delete(@PathVariable("id") String id) {
         User user = AuthInterceptor.getCurrentUser();
         Certification byId = iCertificationService.getById(id);
         Assert.notNull(byId, "该话题已删除");
@@ -157,8 +158,8 @@ public class CertificationController {
      * @param certificationId
      * @return 赞同票数
      */
-    @RequestMapping(value = "/agree",method = RequestMethod.GET)
-    public ApiResult<Integer> agreeNumber(@RequestParam("id") String certificationId){
+    @GetMapping(value = "/agree/{id}")
+    public ApiResult<Integer> agreeNumber(@PathVariable("id") String certificationId){
         Certification certification = certificationMapper.selectById(certificationId);
         if (ObjectUtils.isEmpty(certification))
             return ApiResult.failed("帖子不存在");
@@ -170,8 +171,8 @@ public class CertificationController {
      * @param certificationId
      * @return
      */
-    @RequestMapping(value = "/disagree",method = RequestMethod.GET)
-    public ApiResult<Integer> disagreeNumber(@RequestParam("id") String certificationId){
+    @GetMapping(value = "/disagree/{id}")
+    public ApiResult<Integer> disagreeNumber(@PathVariable("id") String certificationId){
         Certification certification = certificationMapper.selectById(certificationId);
         if (ObjectUtils.isEmpty(certification))
             return ApiResult.failed("帖子不存在");

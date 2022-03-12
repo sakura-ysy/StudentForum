@@ -6,6 +6,9 @@ import com.example.backend.common.api.ApiResult;
 import com.example.backend.module.post.entity.Post;
 import com.example.backend.module.post.entity.Tag;
 import com.example.backend.module.post.service.ITagService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,8 +17,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 // 获取指定标签下的帖子
+@Api(tags = "标签相关接口")
 @RestController
-@RequestMapping("/tag")
+@RequestMapping("/api/tag")
 public class TagController {
 
     @Resource
@@ -28,10 +32,11 @@ public class TagController {
      * @param size
      * @return
      */
-    @GetMapping("/{name}")
+    @ApiOperation("返回指定标签下的帖子列表")
+    @GetMapping("/get/postlist/{name}/{pageNo}/{size}")
     public ApiResult<Map<String, Object>> getTopicsByTag(
-            @PathVariable("name") String tagName,
-            @RequestParam(value = "page", defaultValue = "1") Integer page,
+            @ApiParam("tag名") @PathVariable("name") String tagName,
+            @RequestParam(value = "pageNo", defaultValue = "1") Integer page,
             @RequestParam(value = "size", defaultValue = "10") Integer size) {
 
         Map<String, Object> map = new HashMap<>(16);

@@ -1,7 +1,5 @@
 package com.example.backend.module.user.controller;
 
-import cn.dev33.satoken.stp.SaTokenInfo;
-import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.backend.common.annotation.LoginRequired;
@@ -31,6 +29,9 @@ import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.qiniu.storage.model.DefaultPutRet;
 import com.qiniu.util.Auth;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -47,8 +48,9 @@ import java.util.List;
 import java.util.Map;
 
 // @RestController 相当于 @Controller + @ResponseBody
+@Api(tags = "用户相关接口")
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api/user")
 public class UserController {
     @Resource
     private IUserService iUserService;
@@ -69,6 +71,7 @@ public class UserController {
      * @param dto
      * @return
      */
+    @ApiOperation("用户注册")
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ApiResult<Map<String, Object>> register(@Valid @RequestBody RegisterDTO dto) {
         User user = iUserService.executeRegister(dto);
@@ -83,11 +86,14 @@ public class UserController {
 
     /**
      * 发送短信验证码
-     * @param desMobile
+     * @param map1
      * @return
      */
+    @ApiOperation("发送短信验证码")
     @RequestMapping(value = "/valicode", method = RequestMethod.GET)
-    public ApiResult<Map<String,String>> getValiCode(@RequestParam("mobile") String desMobile ) {
+    public ApiResult<Map<String,String>> getValiCode(
+            @ApiParam("手机号，仅需传入mobile字段")@RequestBody Map<String,String> map1) {
+        String desMobile = map1.get("mobile");
         String random = SendMessageUtils.getRandomCode(6);
         //SendMessageUtils.send("SMS账户","接口秘钥","目标号码","发送内容");
         Integer resultCode = SendMessageUtils.send("yesiyuan","d41d8cd98f00b204e980",desMobile,"验证码:"+ random);
@@ -104,6 +110,7 @@ public class UserController {
      * @param dto
      * @return
      */
+    @ApiOperation("用户登录")
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ApiResult<Map<String, String>> login(@Valid @RequestBody LoginDTO dto) {
         User user = iUserService.getUserByUsername(dto.getUsername());
@@ -129,6 +136,7 @@ public class UserController {
      * 依据token获取用户信息
      * @return
      */
+    @ApiOperation("获取当前用户信息")
     @LoginRequired(allowAll = true)
     @RequestMapping(value = "/info", method = RequestMethod.GET)
     public ApiResult<User> getUser() {
@@ -140,10 +148,11 @@ public class UserController {
      * 退出
      * @return
      */
-    @RequestMapping(value = "/logout",method = RequestMethod.GET)
+    @ApiOperation("用户登出")
+    @LoginRequired(allowAll = true)
+    @RequestMapping(value = "/logout",method = RequestMethod.PUT)
     public ApiResult<Object> logOut() {
         userController.logOutSuccess();
-        StpUtil.logout();
         return ApiResult.success(null,"注销成功") ;
     }
 
@@ -157,22 +166,20 @@ public class UserController {
     /**
      * 查询用户
      * @param username
-     * @param pageNo
-     * @param size
      * @return
      */
-    @GetMapping("/{username}")
-    public ApiResult<Map<String, Object>> getUserByName(@PathVariable("username") String username,
-                                                        @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
-                                                        @RequestParam(value = "size", defaultValue = "10") Integer size) {
-        Map<String, Object> map = new HashMap<>(16);
+    @ApiOperation("根据用户名查用户")
+    @GetMapping("/search/name/{username}")
+    public ApiResult<Map<String, Object>> getUserByName(
+            @ApiParam("用户名username")@PathVariable("username")String username) {
+        Map<String, Object> map1 = new HashMap<>(16);
         User user = iUserService.getUserByUsername(username);
-        Assert.notNull(user, "用户不存在");
-        Page<Post> page = iPostService.page(new Page<>(pageNo, size),
-                new LambdaQueryWrapper<Post>().eq(Post::getUserId, user.getId()));
-        map.put("user", user);
-        map.put("topics", page);
-        return ApiResult.success(map);
+        if (user == null)
+            return ApiResult.failed("用户不存在");
+        List<Post> posts = iPostService.getBaseMapper().selectList(new LambdaQueryWrapper<Post>().eq(Post::getUserId, user.getId()));
+        map1.put("user", user);
+        map1.put("posts",posts) ;
+        return ApiResult.success(map1);
     }
 
 
@@ -181,8 +188,10 @@ public class UserController {
      * @param userid
      * @return
      */
-    @RequestMapping
-    public ApiResult<User> getUserById(@RequestParam("userid") String userid) {
+    @ApiOperation("根据用户ID查用户")
+    @GetMapping("/search/id/{id}")
+    public ApiResult<User> getUserById(
+            @ApiParam("用户id")@PathVariable("id") String userid) {
         User user = iUserService.getBaseMapper().selectById(userid);
         if (ObjectUtils.isEmpty(user)){
             return ApiResult.failed("用户不存在");
@@ -195,6 +204,7 @@ public class UserController {
      * @param user
      * @return
      */
+    @ApiOperation("编辑当前用户信息")
     @PostMapping("/update")
     public ApiResult<User> updateUser(@RequestBody User user) {
         iUserService.updateById(user);
@@ -205,8 +215,9 @@ public class UserController {
      * 获取用户的全部收藏帖子
      * @return
      */
+    @ApiOperation("获取当前用户全部收藏帖子")
     @LoginRequired(allowAll = true)
-    @RequestMapping("/collection")
+    @GetMapping(value = "/collection")
     public ApiResult<List<Post>> getAllCollections(){
         User user = AuthInterceptor.getCurrentUser();
         List<PostCollect> list = postCollectMapper.selectList(new LambdaQueryWrapper<PostCollect>().eq(PostCollect::getUserId, user.getId()));
@@ -224,9 +235,11 @@ public class UserController {
      * @param newAlias 用户新别名
      * @return
      */
+    @ApiOperation("跟新用户昵称")
     @LoginRequired(allowAll = true)
     @PostMapping("/update/alias")
-    public ApiResult<ProfileVO> updateUser(@RequestBody Map<String, String> newAlias) {
+    public ApiResult<ProfileVO> updateUser(
+            @ApiParam("昵称，仅需传入alias字段")@RequestBody Map<String, String> newAlias) {
         System.out.println(newAlias);
         User user = AuthInterceptor.getCurrentUser();
         user.setAlias(newAlias.get("alias"));
@@ -240,9 +253,11 @@ public class UserController {
      * @return
      * @throws IOException
      */
+    @ApiOperation("用户上传头像")
     @LoginRequired(allowAll = true)
     @PostMapping("/update/avatar")
-    public ApiResult<ProfileVO> updateUserAvatar(MultipartFile file) throws IOException {
+    public ApiResult<ProfileVO> updateUserAvatar(
+            @ApiParam("本地头像文件") MultipartFile file) throws IOException {
         /*七牛云配置信息
         accessKey: asn5hMMKnHCgOOnJw-f_0oh1ATDSmm1N7kTHS5jn
         secretKey: A1eMsw3pFjiLLO_cdm7sXF28xydYUp7ExI5PKOLb

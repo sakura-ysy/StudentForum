@@ -13,11 +13,11 @@ public enum ApiErrorCode implements IErrorCode {
     /**
      * 未登录，Token过期
      */
-    UNAUTHORIZED(401, "暂未登录或token已经过期"),
+    UNAUTHORIZED(401, "token错误或token已经过期"),
     /**
-     * 权限不足
+     * 角色无权限
      */
-    FORBIDDEN(403, "权限不足"),
+    ROLE_FORBIDDEN(403, "角色无此权限"),
     /**
      * 参数校验错误
      */

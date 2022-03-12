@@ -1,6 +1,8 @@
 package com.example.backend.module.post.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -97,14 +99,14 @@ public class Post implements Serializable {
      */
     @TableField("is_audited")
     @Builder.Default
-    private Boolean isAudited = false;
+    private Boolean isAudited = true;
 
     /**
      * 是否审核通过
      */
     @TableField("is_pass")
     @Builder.Default
-    private Boolean isPass = false;
+    private Boolean isPass = true;
 
 
     /**

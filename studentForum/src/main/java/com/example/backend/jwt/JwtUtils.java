@@ -1,6 +1,5 @@
 package com.example.backend.jwt;
 
-import cn.dev33.satoken.action.SaTokenActionDefaultImpl;
 import com.example.backend.common.exception.ApiAsserts;
 import com.example.backend.common.exception.CustomException;
 import io.jsonwebtoken.Claims;
@@ -16,6 +15,8 @@ import org.springframework.util.StringUtils;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.util.*;
+
+import static com.example.backend.common.api.ApiErrorCode.FAILED;
 
 /**
  * jwt工具类
@@ -61,7 +62,7 @@ public class JwtUtils {
         try {
             Jwts.parser().setSigningKey(SECRET).parseClaimsJws(token.replace("Bearer", ""));
         } catch (Exception e) {
-            ApiAsserts.fail(e.getMessage());
+            return false;
         }
         return true;
     }

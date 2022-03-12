@@ -1,6 +1,7 @@
 package com.example.backend.common.exception;
 
 import com.baomidou.mybatisplus.extension.exceptions.ApiException;
+import com.example.backend.common.api.ApiResult;
 import com.example.backend.common.api.IErrorCode;
 
 public class ApiAsserts {
@@ -9,16 +10,8 @@ public class ApiAsserts {
      *
      * @param message 说明
      */
-    public static void fail(String message) {
+    public static void fail(IErrorCode code,String message) {
         throw new ApiException(message);
     }
 
-    /**
-     * 抛失败异常
-     *
-     * @param errorCode 状态码
-     */
-    public static void fail(IErrorCode errorCode) {
-        throw new ApiException((com.baomidou.mybatisplus.extension.api.IErrorCode) errorCode);
-    }
 }

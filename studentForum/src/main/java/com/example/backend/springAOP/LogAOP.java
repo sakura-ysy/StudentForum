@@ -64,6 +64,8 @@ public class LogAOP {
     public void saveOperLog(JoinPoint joinPoint, Object keys) {
         // 操作用户
         User user = AuthInterceptor.getCurrentUser();
+        if (user == null)
+            return;
         // 获取RequestAttributes
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         // 从获取RequestAttributes中获取HttpServletRequest的信息

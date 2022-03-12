@@ -20,9 +20,9 @@ public class DoubaoTestApplication extends SpringBootServletInitializer {
         ConfigurableApplicationContext run = SpringApplication.run(DoubaoTestApplication.class, args);
         // 打印容器中的所有组件
         String[] beanDefinitionNames = run.getBeanDefinitionNames();
-        for (String beanDefinitionName : beanDefinitionNames) {
-            // System.out.println(beanDefinitionName);
-        }
+/*        for (String beanDefinitionName : beanDefinitionNames) {
+             System.out.println(beanDefinitionName);
+        }*/
     }
 
 }

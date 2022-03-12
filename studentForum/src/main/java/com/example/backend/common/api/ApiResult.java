@@ -48,7 +48,6 @@ public class ApiResult<T> implements Serializable {
     /**
      * 成功
      *
-     * @param data 结果集
      * @return {code:200,message:操作成功,data:自定义}
      */
     public static <T> ApiResult<T> success() {
@@ -141,6 +140,6 @@ public class ApiResult<T> implements Serializable {
      * 未授权返回结果
      */
     public static <T> ApiResult<T> forbidden(T data) {
-        return new ApiResult<T>(ApiErrorCode.FORBIDDEN.getCode(), ApiErrorCode.FORBIDDEN.getMessage(), data);
+        return new ApiResult<T>(ApiErrorCode.ROLE_FORBIDDEN.getCode(), ApiErrorCode.ROLE_FORBIDDEN.getMessage(), data);
     }
 }
