@@ -2,7 +2,7 @@ package com.example.backend.module.post.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.backend.module.post.entity.Comment;
-import com.example.backend.module.post.entity.CommentVO;
+import com.example.backend.module.post.vo.CommentVO;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 

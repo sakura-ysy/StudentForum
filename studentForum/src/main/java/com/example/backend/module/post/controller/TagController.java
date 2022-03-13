@@ -32,31 +32,31 @@ public class TagController {
      * @param size
      * @return
      */
-    @ApiOperation("返回指定标签下的帖子列表")
-    @GetMapping("/get/postlist/{name}/{pageNo}/{size}")
-    public ApiResult<Map<String, Object>> getTopicsByTag(
-            @ApiParam("tag名") @PathVariable("name") String tagName,
-            @RequestParam(value = "pageNo", defaultValue = "1") Integer page,
-            @RequestParam(value = "size", defaultValue = "10") Integer size) {
-
-        Map<String, Object> map = new HashMap<>(16);
-
-        LambdaQueryWrapper<Tag> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Tag::getName, tagName);
-        Tag one = bmsTagService.getOne(wrapper);
-        Assert.notNull(one, "话题不存在，或已被管理员删除");
-        Page<Post> topics = bmsTagService.selectTopicsByTagId(new Page<>(page, size), one.getId());
-
-        // 其他热门标签
-        Page<Tag> hotTags = bmsTagService.page(new Page<>(1, 10),
-                new LambdaQueryWrapper<Tag>()
-                        .notIn(Tag::getName, tagName)
-                        .orderByDesc(Tag::getTopicCount));
-
-        map.put("topics", topics);
-        map.put("hotTags", hotTags);
-
-        return ApiResult.success(map);
-    }
+    // @ApiOperation("返回指定标签下的帖子列表")
+    // @GetMapping("/get/postlist")
+    // public ApiResult<Map<String, Object>> getTopicsByTag(
+    //         @ApiParam("tag名") @RequestParam(value = "name") String tagName,
+    //         @RequestParam(value = "pageNo", defaultValue = "1") Integer page,
+    //         @RequestParam(value = "size", defaultValue = "10") Integer size) {
+    //
+    //     Map<String, Object> map = new HashMap<>(16);
+    //
+    //     LambdaQueryWrapper<Tag> wrapper = new LambdaQueryWrapper<>();
+    //     wrapper.eq(Tag::getName, tagName);
+    //     Tag one = bmsTagService.getOne(wrapper);
+    //     Assert.notNull(one, "话题不存在，或已被管理员删除");
+    //     Page<Post> topics = bmsTagService.selectTopicsByTagId(new Page<>(page, size), one.getId());
+    //
+    //     // 其他热门标签
+    //     Page<Tag> hotTags = bmsTagService.page(new Page<>(1, 10),
+    //             new LambdaQueryWrapper<Tag>()
+    //                     .notIn(Tag::getName, tagName)
+    //                     .orderByDesc(Tag::getTopicCount));
+    //
+    //     map.put("topics", topics);
+    //     map.put("hotTags", hotTags);
+    //
+    //     return ApiResult.success(map);
+    // }
 
 }

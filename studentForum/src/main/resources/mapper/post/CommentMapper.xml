@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.backend.module.post.mapper.CommentMapper">
     <!-- 结构集映射，column是数据库中的列名，property是Java实体类中的字段名 -->
-    <resultMap id="topicVO" type="com.example.backend.module.post.entity.CommentVO">
+    <resultMap id="topicVO" type="com.example.backend.module.post.vo.CommentVO">
         <id column="id" property="id"/>
         <result column="content" property="content"/>
         <result column="user_id" property="userId"/>

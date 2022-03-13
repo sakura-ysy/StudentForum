@@ -5,7 +5,6 @@ import com.example.backend.common.annotation.LoginRequired;
 import com.example.backend.common.annotation.OperLog;
 import com.example.backend.common.api.ApiResult;
 import com.example.backend.jwt.AuthInterceptor;
-import com.example.backend.jwt.JwtUtils;
 import com.example.backend.module.notify.entity.Notify;
 import com.example.backend.module.notify.service.INotifyService;
 import com.example.backend.module.post.dto.CommentDTO;
@@ -14,6 +13,7 @@ import com.example.backend.module.post.mapper.TopicMapper;
 import com.example.backend.module.post.service.ICommentService;
 import com.example.backend.module.post.service.IPostCollectService;
 import com.example.backend.module.post.service.IPostPraiseService;
+import com.example.backend.module.post.vo.CommentVO;
 import com.example.backend.module.user.entity.User;
 import com.example.backend.module.user.service.IUserService;
 import io.swagger.annotations.Api;
@@ -52,9 +52,9 @@ public class UserPostReactController {
      * @return
      */
     @ApiOperation("获取帖子的一级评论")
-    @GetMapping("/comment/getI/{postId}")
+    @GetMapping("/comment/getI")
     public ApiResult<List<CommentVO>> getCommentsByTopicID(
-            @ApiParam("帖子id") @PathVariable("postId") String postId) {
+            @ApiParam("帖子id") @RequestParam(value = "postId") String postId) {
         List<CommentVO> lstBmsComment = bmsCommentService.getFirstLevelCommentsByTopicID(postId);
         return ApiResult.success(lstBmsComment);
     }
@@ -87,10 +87,10 @@ public class UserPostReactController {
      * @return
      */
     @ApiOperation("获取二级评论")
-    @GetMapping("/comment/getII/{postId}/{parentId}")
+    @GetMapping("/comment/getII")
     public ApiResult<List<CommentVO>> getCommentsByParentID(
-            @ApiParam("帖子id") @PathVariable("postId") String postId,
-            @ApiParam("父评论id") @PathVariable("parentId") String parentId) {
+            @ApiParam("帖子id") @RequestParam(value = "postId") String postId,
+            @ApiParam("父评论id") @RequestParam(value = "parentId") String parentId) {
         System.out.println(parentId);
         List<CommentVO> lstBmsComment = bmsCommentService.getSecondLevelCommentsByParentID(postId, parentId);
         return ApiResult.success(lstBmsComment);

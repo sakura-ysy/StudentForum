@@ -3,7 +3,7 @@ package com.example.backend.module.post.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.backend.module.post.dto.CommentDTO;
 import com.example.backend.module.post.entity.Comment;
-import com.example.backend.module.post.entity.CommentVO;
+import com.example.backend.module.post.vo.CommentVO;
 import com.example.backend.module.post.mapper.CommentMapper;
 import com.example.backend.module.post.service.ICommentService;
 import com.example.backend.module.user.entity.User;
@@ -39,8 +39,6 @@ public class ICommentServiceImpl extends ServiceImpl<CommentMapper, Comment> imp
                 .content(dto.getContent())
                 .topicId(dto.getPostId())
                 .createTime(new Date())
-                .isAudited(false)
-                .isPass(false)
                 .build();
         System.out.println(comment);
         // 插入表
@@ -60,8 +58,6 @@ public class ICommentServiceImpl extends ServiceImpl<CommentMapper, Comment> imp
                 .createTime(new Date())
                 .parentCommentId(dto.getParentId())
                 .replyToId(dto.getReplyToId())
-                .isAudited(false)
-                .isPass(false)
                 .build();
         // 插入表
         this.baseMapper.insert(comment);

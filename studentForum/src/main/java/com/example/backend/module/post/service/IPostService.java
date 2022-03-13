@@ -52,4 +52,12 @@ public interface IPostService extends IService<Post> {
      * @return
      */
     Page<PostVO> searchByKey(String keyword, Page<PostVO> page);
+
+    /**
+     * 按标签搜索
+     * @param tag
+     * @param page
+     * @return
+     */
+    Page<PostVO> searchByTag(String tag, Page<PostVO> page);
 }

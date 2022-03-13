@@ -37,5 +37,13 @@ public interface TopicMapper extends BaseMapper<Post> {
      * @return
      */
     Page<PostVO> searchByKey(@Param("page") Page<PostVO> page, @Param("keyword") String keyword);
+
+    /**
+     * 按tag搜索
+     * @param page
+     * @param tag
+     * @return
+     */
+    Page<PostVO> searchByTag(@Param("tag") Page<PostVO> page, @Param("tag") String tag);
 }
 

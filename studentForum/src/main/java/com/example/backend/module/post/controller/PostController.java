@@ -10,6 +10,7 @@ import com.example.backend.module.post.dto.CreateTopicDTO;
 import com.example.backend.module.post.entity.Post;
 import com.example.backend.module.post.entity.PostCollect;
 import com.example.backend.module.post.entity.PostPraise;
+import com.example.backend.module.post.entity.Tag;
 import com.example.backend.module.post.mapper.PostCollectMapper;
 import com.example.backend.module.post.mapper.PostPraiseMapper;
 import com.example.backend.module.post.mapper.TopicMapper;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -57,9 +59,9 @@ public class PostController {
      * @return
      */
     @ApiOperation("分页获取帖子列表")
-    @GetMapping("/list/{pageNo}/{size}")
-    public ApiResult<Page<PostVO>> list(@PathVariable("pageNo")  Integer pageNo,
-                                        @PathVariable("size")  Integer pageSize) {
+    @GetMapping("/list")
+    public ApiResult<Page<PostVO>> list(@RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
+                                        @RequestParam(value = "size", defaultValue = "10") Integer pageSize) {
         Page<PostVO> list = iPostService.getList(new Page<>(pageNo, pageSize), "latest");
         // Page<> 是自带的有关处理分页的类
         return ApiResult.success(list);
@@ -180,11 +182,48 @@ public class PostController {
     }
 
     @ApiOperation("关键词搜索, 分页返回帖子列表")
-    @GetMapping("/search/list/{keyword}/{pageNo}/{size}")
-    public ApiResult<Page<PostVO>> searchList(@PathVariable("keyword") String keyword,
-                                              @PathVariable("pageNo") Integer pageNum,
-                                              @RequestParam("size") Integer pageSize) {
+    @GetMapping("/search/list")
+    public ApiResult<Page<PostVO>> searchList(@RequestParam(value = "keyword") String keyword,
+                                              @RequestParam(value = "pageNo", defaultValue = "1") Integer pageNum,
+                                              @RequestParam(value = "size", defaultValue = "10") Integer pageSize) {
         Page<PostVO> results = iPostService.searchByKey(keyword, new Page<>(pageNum, pageSize));
         return ApiResult.success(results);
     }
+
+    /**
+     * 返回指定标签下的帖子
+     * @param tagName
+     * @param page
+     * @param size
+     * @return
+     */
+    @ApiOperation("返回指定标签下的帖子列表")
+    @GetMapping("/tag/list")
+    public ApiResult<Map<String, Object>> getTopicsByTag(
+            @ApiParam("tag名") @RequestParam(value = "name") String tagName,
+            @RequestParam(value = "pageNo", defaultValue = "1") Integer page,
+            @RequestParam(value = "size", defaultValue = "10") Integer size) {
+
+        // TODO
+        return null;
+        // Map<String, Object> map = new HashMap<>(16);
+        //
+        // LambdaQueryWrapper<Tag> wrapper = new LambdaQueryWrapper<>();
+        // wrapper.eq(Tag::getName, tagName);
+        // Tag one = bmsTagService.getOne(wrapper);
+        // Assert.notNull(one, "话题不存在，或已被管理员删除");
+        // Page<Post> topics = bmsTagService.selectTopicsByTagId(new Page<>(page, size), one.getId());
+        //
+        // // 其他热门标签
+        // Page<Tag> hotTags = bmsTagService.page(new Page<>(1, 10),
+        //         new LambdaQueryWrapper<Tag>()
+        //                 .notIn(Tag::getName, tagName)
+        //                 .orderByDesc(Tag::getTopicCount));
+        //
+        // map.put("topics", topics);
+        // map.put("hotTags", hotTags);
+        //
+        // return ApiResult.success(map);
+    }
+
 }

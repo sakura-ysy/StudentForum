@@ -47,9 +47,9 @@ public class MissionController {
      * 获取全部任务
      */
     @ApiOperation("获取全部任务")
-    @GetMapping(value = "/list/{pageNo}/{size}")
-    public ApiResult<Page<Mission>> getAllMissions(@PathVariable("pageNo")  Integer pageNo,
-                                                  @PathVariable("size") Integer pageSize) {
+    @GetMapping(value = "/list")
+    public ApiResult<Page<Mission>> getAllMissions(@RequestParam(value = "pageNo", defaultValue = "1") Integer pageNo,
+                                                  @RequestParam(value = "size", defaultValue = "10") Integer pageSize) {
         Page<Mission> missionPage = iMissionService.getAllMissions(new Page<>(pageNo, pageSize), "latest");
         return ApiResult.success(missionPage);
     }

@@ -58,9 +58,9 @@ public class CertificationController {
      * @param pageSize
      * @return
      */
-    @GetMapping("/list/{pageNo}/{size}")
-    public ApiResult<Page<CertificationVO>> list(@PathVariable(value = "pageNo",required = false)  Integer pageNo,
-                                               @PathVariable(value = "size",required = false) Integer pageSize) {
+    @GetMapping("/list")
+    public ApiResult<Page<CertificationVO>> list(@RequestParam(value = "pageNo", defaultValue = "1")  Integer pageNo,
+                                               @RequestParam(value = "size", defaultValue = "10") Integer pageSize) {
         Page<CertificationVO> list = iCertificationService.getList(new Page<>(pageNo, pageSize), "latest");
         // Page<> 是自带的有关处理分页的类
         return ApiResult.success(list);

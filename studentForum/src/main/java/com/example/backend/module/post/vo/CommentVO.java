@@ -1,4 +1,4 @@
-package com.example.backend.module.post.entity;
+package com.example.backend.module.post.vo;
 
 import lombok.Data;
 

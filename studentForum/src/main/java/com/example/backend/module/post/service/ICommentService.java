@@ -3,7 +3,7 @@ package com.example.backend.module.post.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.backend.module.post.dto.CommentDTO;
 import com.example.backend.module.post.entity.Comment;
-import com.example.backend.module.post.entity.CommentVO;
+import com.example.backend.module.post.vo.CommentVO;
 import com.example.backend.module.user.entity.User;
 
 import java.util.List;

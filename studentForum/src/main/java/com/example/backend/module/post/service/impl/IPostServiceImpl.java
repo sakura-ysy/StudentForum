@@ -10,6 +10,7 @@ import com.example.backend.module.post.mapper.*;
 import com.example.backend.module.post.service.IPostService;
 import com.example.backend.module.post.service.ITagService;
 import com.example.backend.module.post.service.ITopicTagService;
+import com.example.backend.module.post.vo.CommentVO;
 import com.example.backend.module.post.vo.PostVO;
 import com.example.backend.module.user.entity.User;
 import com.example.backend.module.user.mapper.UserMapper;
@@ -139,6 +140,17 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
         // 查询话题的标签
         setTopicTags(iPage);
         return iPage;
+    }
+    /**
+     * // 按标签查询
+     * @param tag
+     * @param page
+     * @return
+     */
+    @Override
+    public Page<PostVO> searchByTag(String tag, Page<PostVO> page) {
+        // TODO
+        return null;
     }
 
     private void setTopicTags(Page<PostVO> iPage) {

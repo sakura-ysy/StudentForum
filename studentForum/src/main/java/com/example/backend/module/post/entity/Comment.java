@@ -76,11 +76,13 @@ public class Comment implements Serializable {
      * 是否审核通过
      */
     @TableField("is_audited")
-    private Boolean isAudited;
+    @Builder.Default
+    private Boolean isAudited = true;
 
     /**
      * 是否审核通过
      */
     @TableField("is_pass")
-    private Boolean isPass;
+    @Builder.Default
+    private Boolean isPass = true;
 }
