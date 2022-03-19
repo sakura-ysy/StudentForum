@@ -6,6 +6,7 @@
         <result column="title" property="title"/>
         <result column="user_id" property="userId"/>
         <result column="comments" property="comments"/>
+        <result column="content" property="content"/>
         <result column="view" property="view"/>
         <result column="collects" property="collects"/>
         <result column="top" property="top"/>
@@ -20,7 +21,7 @@
 
     <select id="selectListAndPage" resultMap="topicVO">
         SELECT
-        t.id,t.title,t.user_id,t.comments,
+        t.id,t.title,t.user_id,t.comments,t.content,
         t.view,t.collects,t.top,t.essence,
         t.create_time ,t.modify_time ,t.is_pass,
         u.username,u.alias, u.avatar
