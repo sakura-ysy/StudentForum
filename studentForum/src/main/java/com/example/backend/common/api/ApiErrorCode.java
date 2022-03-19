@@ -17,15 +17,23 @@ public enum ApiErrorCode implements IErrorCode {
     /**
      * 角色无权限
      */
-    ROLE_FORBIDDEN(403, "角色无此权限"),
+    ROLE_FORBIDDEN(402, "角色无此权限"),
     /**
      * 参数校验错误
      */
-    VALIDATE_FAILED(404, "参数检验失败"),
+    VALIDATE_FAILED(403, "参数检验失败"),
     /**
      * 用户不存在
      */
-    USER_NOT_EXISTS(-1,"用户不存在");
+    USER_NOT_EXISTS(404,"用户不存在"),
+    /**
+     * 帖子不存在
+     */
+    POST_NOT_EXISTS(405,"帖子不存在"),
+    /**
+     * 获取评论失败
+     */
+    COMMENT_FAILED(406,"获取一级评论失败");
 
     private final Integer code;
     private final String message;

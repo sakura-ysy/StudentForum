@@ -7,6 +7,7 @@ import com.example.backend.common.annotation.OperLog;
 import com.example.backend.common.api.ApiResult;
 import com.example.backend.jwt.AuthInterceptor;
 import com.example.backend.jwt.JwtUtils;
+import com.example.backend.module.post.vo.PostVO;
 import com.example.backend.module.user.entity.UserRole;
 import com.example.backend.module.post.entity.Post;
 import com.example.backend.module.post.entity.PostCollect;
@@ -32,6 +33,7 @@ import com.qiniu.util.Auth;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import javafx.geometry.Pos;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
@@ -133,7 +135,7 @@ public class UserController {
     }
 
     /**
-     * 依据token获取用户信息
+     * 获取当前用户信息
      * @return
      */
     @ApiOperation("获取当前用户信息")
@@ -218,18 +220,32 @@ public class UserController {
     @ApiOperation("获取当前用户全部收藏帖子")
     @LoginRequired(allowAll = true)
     @GetMapping(value = "/collection")
-    public ApiResult<List<Post>> getAllCollections(){
+    public ApiResult<List<PostVO>> getAllCollections(){
         User user = AuthInterceptor.getCurrentUser();
         List<PostCollect> list = postCollectMapper.selectList(new LambdaQueryWrapper<PostCollect>().eq(PostCollect::getUserId, user.getId()));
         if (list==null)
             return ApiResult.success(null);
-        List<Post> postList = new ArrayList<>();
+        List<PostVO> postList = new ArrayList<>();
         for (PostCollect postCollect : list) {
             String postId = postCollect.getPostId();
             Post post = topicMapper.selectById(postId);
-            postList.add(post);
+            PostVO postVO = iPostService.changePostToPostVO(post);
+            postList.add(postVO);
         }
         return ApiResult.success(postList);
+    }
+
+    /**
+     * 获取当前用户全部帖子
+     * @return
+     */
+    @ApiOperation("获取当前用户全部帖子")
+    @LoginRequired(allowAll = true)
+    @GetMapping("/post/list")
+    public ApiResult<List<PostVO>> getAllPosts() throws IOException {
+        User user = AuthInterceptor.getCurrentUser();
+        List<PostVO> postVOs = iPostService.getAllPostForUser(user.getId());
+        return ApiResult.success(postVOs);
     }
 
     /**

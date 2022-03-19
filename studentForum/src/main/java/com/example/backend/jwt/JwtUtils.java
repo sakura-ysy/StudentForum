@@ -28,7 +28,7 @@ public class JwtUtils {
     @Value("${jwt.tokenHeader}")
     private String tokenHeader;
 
-    private final int EXPIRATION = 60 * 60 * 1000;
+    private final int EXPIRATION = 7 * 24 * 60 * 60 * 1000;
 
     /**
      * 生成token字符串

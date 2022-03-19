@@ -8,6 +8,7 @@ import com.example.backend.module.post.entity.Post;
 import com.example.backend.module.post.vo.PostVO;
 import com.example.backend.module.user.entity.User;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public interface IPostService extends IService<Post> {
      * @param principal
      * @return
      */
-    Post create(CreateTopicDTO dto, User principal);
+    PostVO create(CreateTopicDTO dto, User principal);
 
     /**
      * 查看话题详情
@@ -36,7 +37,7 @@ public interface IPostService extends IService<Post> {
      * @param id
      * @return
      */
-    Map<String, Object> viewTopic(String id);
+    PostVO viewTopic(String id) throws IOException;
     /**
      * 获取随机推荐10篇
      *
@@ -60,4 +61,18 @@ public interface IPostService extends IService<Post> {
      * @return
      */
     Page<PostVO> searchByTag(String tag, Page<PostVO> page);
+
+    /**
+     * 把post转成postVO
+     * @param post
+     * @return
+     */
+    PostVO changePostToPostVO(Post post);
+
+    /**
+     * 获取用户全部帖子
+     * @param userId
+     * @return
+     */
+    List<PostVO> getAllPostForUser(String userId) throws IOException;
 }

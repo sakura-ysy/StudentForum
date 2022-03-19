@@ -28,6 +28,12 @@ public class PostVO implements Serializable {
      */
     @ApiModelProperty("作者用户id")
     private String userId;
+
+    /**
+     * 内容
+     */
+    private String content;
+
     /**
      * 头像
      */
@@ -77,7 +83,7 @@ public class PostVO implements Serializable {
      * 话题关联标签
      */
     @ApiModelProperty("帖子的标签")
-    private List<Tag> tags;
+    private List<String> tags;
     /**
      * 浏览量
      */

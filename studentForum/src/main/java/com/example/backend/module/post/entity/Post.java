@@ -45,6 +45,8 @@ public class Post implements Serializable {
     @TableField("user_id")
     private String userId;
 
+
+
     /**
      * 评论数
      */
@@ -124,7 +126,7 @@ public class Post implements Serializable {
     /**
      *
      */
-    @TableField(value = "tags")
-    private String tags;
+    //@TableField(value = "tags")
+    //private String tags;
 }
 

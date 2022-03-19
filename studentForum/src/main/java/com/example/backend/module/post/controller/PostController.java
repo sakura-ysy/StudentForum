@@ -1,5 +1,6 @@
 package com.example.backend.module.post.controller;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.backend.common.annotation.LoginRequired;
@@ -22,12 +23,14 @@ import com.vdurmont.emoji.EmojiParser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.springframework.beans.BeanUtils;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -76,10 +79,10 @@ public class PostController {
     @ApiOperation("发布帖子")
     @LoginRequired(allowAll = true)
     @RequestMapping(value = "/create", method = RequestMethod.POST)
-    public ApiResult<Post> create(@RequestBody CreateTopicDTO dto) {
+    public ApiResult<PostVO> create(@RequestBody CreateTopicDTO dto) {
         User user = AuthInterceptor.getCurrentUser();
-        Post topic = iPostService.create(dto, user);
-        return ApiResult.success(topic);
+        PostVO postVO = iPostService.create(dto, user);
+        return ApiResult.success(postVO);
     }
 
 
@@ -90,10 +93,10 @@ public class PostController {
      */
     @ApiOperation("获取帖子详情，id检索")
     @GetMapping("/{id}")
-    public ApiResult<Map<String, Object>> view(
-            @ApiParam("帖子id") @PathVariable("id") String id) {
-        Map<String, Object> map = iPostService.viewTopic(id);
-        return ApiResult.success(map);
+    public ApiResult<PostVO> view(
+            @ApiParam("帖子id") @PathVariable("id") String id) throws IOException {
+        PostVO postVO = iPostService.viewTopic(id);
+        return ApiResult.success(postVO);
     }
 
 
@@ -118,14 +121,14 @@ public class PostController {
     @ApiOperation("编辑帖子")
     @LoginRequired(allowAll = true)
     @PostMapping("/update")
-    public ApiResult<Post> update(@Valid @RequestBody Post post) {
+    public ApiResult<PostVO> update(@Valid @RequestBody Post post) {
         User user = AuthInterceptor.getCurrentUser();
         // 判断待编辑帖子的作者id是否等于当前用户id，如果不等于则抛出message，结束
         Assert.isTrue(user.getId().equals(post.getUserId()), "非本人无权修改");
         post.setModifyTime(new Date());  // 重置改贴时间
         post.setContent(EmojiParser.parseToAliases(post.getContent()));  // 对emoji编码
         iPostService.updateById(post); // 更新表中对象
-        return ApiResult.success(post);
+        return ApiResult.success(iPostService.changePostToPostVO(post));
     }
 
 

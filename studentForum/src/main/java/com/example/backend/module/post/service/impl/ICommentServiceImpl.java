@@ -1,32 +1,62 @@
 package com.example.backend.module.post.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.backend.common.api.ErrorResponse;
 import com.example.backend.module.post.dto.CommentDTO;
 import com.example.backend.module.post.entity.Comment;
+import com.example.backend.module.post.entity.Post;
+import com.example.backend.module.post.service.IPostService;
 import com.example.backend.module.post.vo.CommentVO;
 import com.example.backend.module.post.mapper.CommentMapper;
 import com.example.backend.module.post.service.ICommentService;
 import com.example.backend.module.user.entity.User;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static com.example.backend.common.api.ApiErrorCode.COMMENT_FAILED;
+
 @Slf4j
 @Service
 public class ICommentServiceImpl extends ServiceImpl<CommentMapper, Comment> implements ICommentService {
-    // 1. 获取指定帖子的所有评论
+
+    @Resource
+    private IPostService iPostService;
+
+    /**
+     * 获取帖子评论树
+     * @param postId
+     * @return
+     * @throws IOException
+     */
     @Override
-    public List<CommentVO> getFirstLevelCommentsByTopicID(String topicid) {
-        List<CommentVO> lstBmsComment = new ArrayList<CommentVO>();
-        try {
-            // 通过帖子id获取文章
-            lstBmsComment = this.baseMapper.getCommentsByTopicID(topicid);
-        } catch (Exception e) {
-            log.info("获取一级评论失败");
+    public List<CommentVO> getCommentTreeByPostId(String postId) throws IOException {
+        // 先获取帖子的所有一级评论
+        List<CommentVO> list = this.getFirstLevelCommentsByTopicID(postId);
+        // 获取一级评论的所有二级评论
+        for (CommentVO commentVO : list) {
+            String comId = commentVO.getId();
+            commentVO.setChildComment(this.getSecondLevelCommentsByParentID(postId,comId));
         }
+        return list;
+    }
+
+    /**
+     * 获取帖子所有一级评论
+     * @param topicid
+     * @return
+     * @throws IOException
+     */
+    @Override
+    public List<CommentVO> getFirstLevelCommentsByTopicID(String topicid) throws IOException {
+        List<CommentVO> lstBmsComment = new ArrayList<CommentVO>();
+        lstBmsComment = this.baseMapper.getCommentsByTopicID(topicid);
         return lstBmsComment;
     }
 
@@ -43,6 +73,10 @@ public class ICommentServiceImpl extends ServiceImpl<CommentMapper, Comment> imp
         System.out.println(comment);
         // 插入表
         this.baseMapper.insert(comment);
+        // 帖子评论数加1
+        Post post = iPostService.getById(dto.getPostId());
+        post.setComments(post.getComments() + 1);
+        iPostService.updateById(post);
         return comment;
     }
 
@@ -61,20 +95,24 @@ public class ICommentServiceImpl extends ServiceImpl<CommentMapper, Comment> imp
                 .build();
         // 插入表
         this.baseMapper.insert(comment);
+        // 帖子评论数加1
+        Post post = iPostService.getById(dto.getPostId());
+        post.setComments(post.getComments() + 1);
+        iPostService.updateById(post);
         return comment;
     }
 
-    // 4.获得二级评论
+    /**
+     * 获取一级评论的所有二级评论
+     * @param topicId
+     * @param parentId
+     * @return
+     */
     @Override
     public List<CommentVO> getSecondLevelCommentsByParentID(String topicId, String parentId) {
         List<CommentVO> SecondLevelComments = new ArrayList<CommentVO>();
-        try {
-            // 通过parentId获取二级评论
-            SecondLevelComments = this.baseMapper.getSecondLevelCommentsByParentID(topicId, parentId);
-        } catch (Exception e) {
-            e.printStackTrace();
-            log.info("获取二级评论失败");
-        }
+        // 通过parentId获取二级评论
+        SecondLevelComments = this.baseMapper.getSecondLevelCommentsByParentID(topicId, parentId);
         return SecondLevelComments;
     }
 }
