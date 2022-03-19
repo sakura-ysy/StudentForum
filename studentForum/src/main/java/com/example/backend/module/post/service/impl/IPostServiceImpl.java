@@ -126,14 +126,14 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
         // 标签  找到帖子绑定的所有标签
         QueryWrapper<TopicTag> wrapper = new QueryWrapper<>();
         wrapper.lambda().eq(TopicTag::getTopicId, topic.getId());
-        Set<String> set = new HashSet<>();
+        List<Tag> tags = new ArrayList<>();
         List<TopicTag>  topicTags = ITopicTagService.getBaseMapper().selectList(wrapper);
         if(topicTags != null){
-            for (TopicTag articleTag : topicTags) {
-                set.add(articleTag.getTagId());  // 把每一个相关标签的id存放在set中
+            for (TopicTag topicTag : topicTags) {
+                Tag tag = iTagService.getById(topicTag.getTagId());
+                tags.add(tag);
             }
         }
-        List<Tag> tags = iTagService.listByIds(set);  // 通过set得到每一个标签的具体信息，存入集合
         map.put("tags", tags);
         // 作者
         ProfileVO user = iUserService.getUserProfile(topic.getUserId()); // 得到用户信息，只需要Profile中的字段
