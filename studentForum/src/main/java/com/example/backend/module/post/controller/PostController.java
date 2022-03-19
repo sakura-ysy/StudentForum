@@ -93,10 +93,10 @@ public class PostController {
      */
     @ApiOperation("获取帖子详情，id检索")
     @GetMapping("/{id}")
-    public ApiResult<PostVO> view(
+    public ApiResult<Map<String, Object>> view(
             @ApiParam("帖子id") @PathVariable("id") String id) throws IOException {
-        PostVO postVO = iPostService.viewTopic(id);
-        return ApiResult.success(postVO);
+        Map<String, Object> map = iPostService.viewTopic(id);
+        return ApiResult.success(map);
     }
 
 

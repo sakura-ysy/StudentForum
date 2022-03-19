@@ -37,7 +37,7 @@ public interface IPostService extends IService<Post> {
      * @param id
      * @return
      */
-    PostVO viewTopic(String id) throws IOException;
+    Map<String, Object> viewTopic(String id) throws IOException;
     /**
      * 获取随机推荐10篇
      *
