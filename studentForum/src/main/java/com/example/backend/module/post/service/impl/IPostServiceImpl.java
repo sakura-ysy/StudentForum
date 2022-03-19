@@ -139,7 +139,7 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
         }
         List<Tag> tags = iTagService.listByIds(set);  // 通过set得到每一个标签的具体信息，存入集合
         map.put("tags", tags);
-        
+
         return map;
     }
 
@@ -175,11 +175,7 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
             if (!topicTags.isEmpty()) {
                 List<String> tagIds = topicTags.stream().map(TopicTag::getTagId).collect(Collectors.toList());
                 List<Tag> tags = tagMapper.selectBatchIds(tagIds);
-                List<String> tagName = new ArrayList<>();
-                for (Tag tag : tags) {
-                    tagName.add(tag.getName());
-                }
-                topic.setTags(tagName);
+                topic.setTags(tags);
             }
         });
     }
@@ -201,28 +197,6 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
     }
 
     @Override
-    public PostVO changePostToPostVO(Post post){
-        PostVO postVO = new PostVO();
-        BeanUtils.copyProperties(post,postVO);
-        List<String> tags = new ArrayList<>();
-        // 标签
-        List<TopicTag> postTag = ITopicTagService.getBaseMapper().selectList(new LambdaQueryWrapper<TopicTag>().eq(TopicTag::getTopicId,post.getId()));
-        for (TopicTag topicTag : postTag) {
-            Tag tag = iTagService.getById(topicTag.getTagId());
-            tags.add(tag.getName());
-        }
-        postVO.setTags(tags);
-        // 作者相关
-        User user = iUserService.getById(post.getUserId());
-        if (user != null){
-            postVO.setAlias(user.getAlias());
-            postVO.setAvatar(user.getAvatar());
-            postVO.setUsername(user.getUsername());
-        }
-        return postVO;
-    }
-
-    @Override
     public List<PostVO> getAllPostForUser(String userId) throws IOException {
         User user = iUserService.getById(userId);
         if(user == null){
@@ -235,5 +209,27 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
             postVOs.add(this.changePostToPostVO(post));
         }
         return postVOs;
+    }
+
+    @Override
+    public PostVO changePostToPostVO(Post post){
+        PostVO postVO = new PostVO();
+        BeanUtils.copyProperties(post,postVO);
+        List<Tag> tags = new ArrayList<>();
+        // 标签
+        List<TopicTag> postTag = ITopicTagService.getBaseMapper().selectList(new LambdaQueryWrapper<TopicTag>().eq(TopicTag::getTopicId,post.getId()));
+        for (TopicTag topicTag : postTag) {
+            Tag tag = iTagService.getById(topicTag.getTagId());
+            tags.add(tag);
+        }
+        postVO.setTags(tags);
+        // 作者相关
+        User user = iUserService.getById(post.getUserId());
+        if (user != null){
+            postVO.setAlias(user.getAlias());
+            postVO.setAvatar(user.getAvatar());
+            postVO.setUsername(user.getUsername());
+        }
+        return postVO;
     }
 }

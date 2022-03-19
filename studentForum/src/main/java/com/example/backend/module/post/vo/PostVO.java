@@ -83,7 +83,7 @@ public class PostVO implements Serializable {
      * 话题关联标签
      */
     @ApiModelProperty("帖子的标签")
-    private List<String> tags;
+    private List<Tag> tags;
     /**
      * 浏览量
      */
