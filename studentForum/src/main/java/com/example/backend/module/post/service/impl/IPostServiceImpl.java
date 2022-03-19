@@ -140,6 +140,9 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
         List<Tag> tags = iTagService.listByIds(set);  // 通过set得到每一个标签的具体信息，存入集合
         map.put("tags", tags);
 
+        // 作者
+        ProfileVO user = iUserService.getUserProfile(topic.getUserId()); // 得到用户信息，只需要Profile中的字段
+        map.put("user", user);
         return map;
     }
 
