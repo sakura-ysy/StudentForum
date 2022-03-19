@@ -113,33 +113,28 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
     public Map<String, Object> viewTopic(String id) throws IOException {
         Map<String, Object> map = new HashMap<>(16);
         Post topic = this.baseMapper.selectById(id);  // topic 为指定的帖子对象
-        Assert.notNull(topic, "当前话题不存在,或已被作者删除");
+        if (topic == null){
+            ErrorResponse.sendJsonMessage(POST_NOT_EXISTS);
+            return null;
+        }
         // 查询话题详情
         topic.setView(topic.getView() + 1);  // view表示帖子的访问次数，访问一次加一一次
         this.baseMapper.updateById(topic);
         // emoji转码
         topic.setContent(EmojiParser.parseToUnicode(topic.getContent()));
-        // 点赞、收藏、评论数
-        List<PostCollect> collectList = postCollectMapper.selectList(new LambdaQueryWrapper<PostCollect>().eq(PostCollect::getPostId,topic.getId()));
-        topic.setCollects(collectList.size());
-        List<PostPraise> praiseList = postPraiseMapper.selectList(new LambdaQueryWrapper<PostPraise>().eq(PostPraise::getPostId,topic.getId()));
-        if (ObjectUtils.isEmpty(praiseList))
-            topic.setPraises(0);
-        else
-            topic.setPraises(praiseList.size());
-        List<CommentVO> commentVOList = commentMapper.getCommentsByTopicID(topic.getId());
-        topic.setComments(commentVOList.size());
         map.put("topic", topic);
         // 标签  找到帖子绑定的所有标签
         QueryWrapper<TopicTag> wrapper = new QueryWrapper<>();
         wrapper.lambda().eq(TopicTag::getTopicId, topic.getId());
         Set<String> set = new HashSet<>();
-        for (TopicTag articleTag : ITopicTagService.list(wrapper)) {
-            set.add(articleTag.getTagId());  // 把每一个相关标签的id存放在set中
+        List<TopicTag>  topicTags = ITopicTagService.getBaseMapper().selectList(wrapper);
+        if(topicTags != null){
+            for (TopicTag articleTag : topicTags) {
+                set.add(articleTag.getTagId());  // 把每一个相关标签的id存放在set中
+            }
         }
         List<Tag> tags = iTagService.listByIds(set);  // 通过set得到每一个标签的具体信息，存入集合
         map.put("tags", tags);
-
         // 作者
         ProfileVO user = iUserService.getUserProfile(topic.getUserId()); // 得到用户信息，只需要Profile中的字段
         map.put("user", user);
