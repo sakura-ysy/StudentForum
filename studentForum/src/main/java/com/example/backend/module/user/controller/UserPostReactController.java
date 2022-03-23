@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.backend.common.annotation.LoginRequired;
 import com.example.backend.common.annotation.OperLog;
 import com.example.backend.common.api.ApiResult;
+import com.example.backend.common.enums.NotifyTypeEnum;
 import com.example.backend.jwt.AuthInterceptor;
 import com.example.backend.module.notify.entity.Notify;
 import com.example.backend.module.notify.service.INotifyService;
@@ -82,10 +83,9 @@ public class UserPostReactController {
         User user = AuthInterceptor.getCurrentUser();
         Comment comment = bmsCommentService.createFirstLevelComment(dto, user);
 
-//        // 新增一级评论通知
-//        Post post = topicMapper.selectById(dto.getTopic_id());
-//        iNotifyService.createNotify(post.getUserId(),user.getId(),"2", dto.getTopic_id());
-
+        // 新增一级评论通知
+        Post post = topicMapper.selectById(dto.getPostId());
+        iNotifyService.createNotify(user.getId(), post.getUserId(), post.getId(), NotifyTypeEnum.POST_COMMENT.getTargetType());
         return ApiResult.success(comment);
     }
 
@@ -117,14 +117,15 @@ public class UserPostReactController {
         User user = AuthInterceptor.getCurrentUser();
         Comment comment = bmsCommentService.createSecondLevelComment(dto, user);
 
-//        // 新增二级评论通知
-//        Post post = topicMapper.selectById(dto.getTopic_id());
-//        Comment parentComment = bmsCommentService.getBaseMapper().selectById(dto.getParentId());
-//
-//        if (comment.getReplyToId() != null) {
-//            iNotifyService.createNotify(comment.getReplyToId(),user.getId(),"4", dto.getTopic_id());
-//        }
-//            iNotifyService.createNotify(parentComment.getUserId(), user.getId(),"2", dto.getTopic_id());
+        // 新增二级评论通知
+        Post post = topicMapper.selectById(dto.getPostId());
+        Comment parentComment = bmsCommentService.getBaseMapper().selectById(dto.getParentId());
+
+        if (comment.getReplyToId() != null) {
+            iNotifyService.createNotify(user.getId(), dto.getReplyToId(), comment.getId(), NotifyTypeEnum.COMMENT_COMMENT.getTargetType());
+        }
+        iNotifyService.createNotify(user.getId(), comment.getUserId(), comment.getId(), NotifyTypeEnum.COMMENT_COMMENT.getTargetType());
+
         return ApiResult.success(comment);
     }
 
@@ -149,7 +150,7 @@ public class UserPostReactController {
 
         // 新增点赞通知
         Post post = topicMapper.selectById(id);
-        iNotifyService.createNotify(post.getUserId(),user.getId(),"1", id);
+        iNotifyService.createNotify(user.getId(), post.getUserId(), post.getId(), NotifyTypeEnum.POST_PRAISE.getTargetType());
 
         return ApiResult.success(null,"点赞成功");
     }
@@ -174,9 +175,9 @@ public class UserPostReactController {
         }
         // 取消点赞通知
         Post post = topicMapper.selectById(id);
-        iNotifyService.remove(new LambdaQueryWrapper<Notify>().eq(Notify::getTopicId, id)
-                .eq(Notify::getFromId, user.getId())
-                .eq(Notify::getAction, "1")
+        iNotifyService.remove(new LambdaQueryWrapper<Notify>().eq(Notify::getNotifier, user.getId())
+                .eq(Notify::getTargetId, post.getId())
+                .eq(Notify::getType, NotifyTypeEnum.POST_PRAISE)
         );
 
         return ApiResult.success(null,"取赞成功");
@@ -202,7 +203,7 @@ public class UserPostReactController {
         }
         // 新增收藏通知
         Post post = topicMapper.selectById(id);
-        iNotifyService.createNotify(post.getUserId(),user.getId(),"3", id);
+        iNotifyService.createNotify(user.getId(), post.getUserId(), post.getId(), NotifyTypeEnum.POST_COLLECT.getTargetType());
 
         return ApiResult.success(null,"收藏成功");
     }
@@ -227,9 +228,9 @@ public class UserPostReactController {
         }
         // 取消收藏通知
         Post post = topicMapper.selectById(id);
-        iNotifyService.remove(new LambdaQueryWrapper<Notify>().eq(Notify::getTopicId, id)
-                .eq(Notify::getFromId, user.getId())
-                .eq(Notify::getAction, "3")
+        iNotifyService.remove(new LambdaQueryWrapper<Notify>().eq(Notify::getNotifier, user.getId())
+                .eq(Notify::getTargetId, post.getId())
+                .eq(Notify::getType, NotifyTypeEnum.POST_COMMENT.getTargetType())
         );
         return ApiResult.success(null,"取消收藏成功");
     }

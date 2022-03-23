@@ -3,6 +3,7 @@ package com.example.backend.module.user.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.example.backend.common.annotation.LoginRequired;
 import com.example.backend.common.api.ApiResult;
+import com.example.backend.common.enums.NotifyTypeEnum;
 import com.example.backend.common.exception.ApiAsserts;
 import com.example.backend.jwt.AuthInterceptor;
 import com.example.backend.jwt.JwtUtils;
@@ -75,7 +76,7 @@ public class RelationshipController {
         bmsFollowService.save(follow);
 
         //新增关注通知
-        iNotifyService.createNotify(parentId,user.getId(),"5", null);
+        iNotifyService.createNotify(user.getId(), parentId, parentId, NotifyTypeEnum.USER_SUBSCRIBE.getTargetType());
 
         return ApiResult.success(null, "关注成功");
     }
@@ -105,9 +106,9 @@ public class RelationshipController {
         bmsFollowService.remove(new LambdaQueryWrapper<Follow>().eq(Follow::getParentId, parentId)
                 .eq(Follow::getFollowerId, user.getId()));
         // 取消关注
-        iNotifyService.remove(new LambdaQueryWrapper<Notify>().eq(Notify::getUserId, parentId)
-                .eq(Notify::getFromId, user.getId())
-                .eq(Notify::getAction, "5")
+        iNotifyService.remove(new LambdaQueryWrapper<Notify>().eq(Notify::getNotifier, user.getId())
+                .eq(Notify::getReceiver, parentId)
+                .eq(Notify::getType, NotifyTypeEnum.USER_SUBSCRIBE.getTargetType())
         );
 
         return ApiResult.success(null, "取关成功");
