@@ -93,6 +93,7 @@ public class IAnswerServiceImpl extends ServiceImpl<AnswerMapper,Answer> impleme
             return null;
         }
         answerVO.setUsername(user.getUsername());
+        answerVO.setAvatar(user.getAvatar());
         // 一级
         if(answer.getReplyToId() == null){
             List<Answer> list = this.getBaseMapper().selectList(new LambdaQueryWrapper<Answer>().eq(Answer::getReplyToId,answer.getId()).eq(Answer::getQuestionId,answer.getQuestionId()));

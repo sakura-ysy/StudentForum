@@ -34,6 +34,11 @@ public class CommentVO {
     private String username;
 
     /**
+     * 发布者头像
+     */
+    private String avatar;
+
+    /**
      * 评论时间
      */
     private Date createTime;

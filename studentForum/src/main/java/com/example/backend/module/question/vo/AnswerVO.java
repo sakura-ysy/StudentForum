@@ -40,6 +40,11 @@ public class AnswerVO implements Serializable {
     private String username;
 
     /**
+     * 头像
+     */
+    private String avatar;
+
+    /**
      * 回答时间
      */
     private Date createTime;

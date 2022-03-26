@@ -8,6 +8,7 @@
         <result column="user_id" property="userId"/>
         <result column="topic_id" property="topicId"/>
         <result column="username" property="username"/>
+        <result column="avatar" property="avatar"/>
         <result column="create_time" property="createTime"/>
     </resultMap>
 
