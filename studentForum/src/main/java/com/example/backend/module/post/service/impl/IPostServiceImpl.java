@@ -67,11 +67,30 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
     public Page<PostVO> getList(Page<PostVO> page, String tab) {
         // 查询话题
         Page<PostVO> iPage = this.baseMapper.selectListAndPage(page, tab);
-        // 查询话题的标签
-        setTopicTags(iPage);
-        // 获取点赞、收藏、评论数
-        setReactionNum(iPage);
-        return iPage;
+        Page<PostVO> res = new Page<PostVO>(page.getCurrent(),page.getSize());
+        res.setTotal(iPage.getTotal());
+        List<PostVO> list = new ArrayList<>();
+        for (PostVO postVO : iPage.getRecords()) {
+            // 点赞, 收藏, 评论数
+            List<PostPraise> praiseList = iPostPraiseService.getBaseMapper().selectList(new LambdaQueryWrapper<PostPraise>().eq(PostPraise::getPostId,postVO.getId()));
+            postVO.setPraises(praiseList.size());
+            List<PostCollect> collectList = iPostCollectService.getBaseMapper().selectList(new LambdaQueryWrapper<PostCollect>().eq(PostCollect::getPostId,postVO.getId()));
+            postVO.setCollects(collectList.size());
+            List<Comment> commentList = commentMapper.selectList(new LambdaQueryWrapper<Comment>().eq(Comment::getTopicId,postVO.getId()));
+            postVO.setComments(commentList.size());
+            // tag相关
+            List<Tag> tags = new ArrayList<>();
+            // 标签
+            List<TopicTag> postTag = ITopicTagService.getBaseMapper().selectList(new LambdaQueryWrapper<TopicTag>().eq(TopicTag::getTopicId,postVO.getId()));
+            for (TopicTag topicTag : postTag) {
+                Tag tag = iTagService.getById(topicTag.getTagId());
+                tags.add(tag);
+            }
+            postVO.setTags(tags);
+            list.add(postVO);
+        }
+        res.setRecords(list);
+        return res;
     }
 
     @Override
@@ -184,22 +203,6 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
                 List<String> tagIds = topicTags.stream().map(TopicTag::getTagId).collect(Collectors.toList());
                 List<Tag> tags = tagMapper.selectBatchIds(tagIds);
                 topic.setTags(tags);
-            }
-        });
-    }
-    private void setReactionNum(Page<PostVO> iPage) {
-        iPage.getRecords().forEach(topic -> {
-            List<TopicTag> topicTags = ITopicTagService.selectByTopicId(topic.getId());
-            if (!topicTags.isEmpty()) {
-                List<PostCollect> collectList = postCollectMapper.selectList(new LambdaQueryWrapper<PostCollect>().eq(PostCollect::getPostId,topic.getId()));
-                topic.setCollects(collectList.size());
-                List<PostPraise> praiseList = postPraiseMapper.selectList(new LambdaQueryWrapper<PostPraise>().eq(PostPraise::getPostId,topic.getId()));
-                if (ObjectUtils.isEmpty(praiseList))
-                    topic.setPraises(0);
-                else
-                    topic.setPraises(praiseList.size());
-                List<CommentVO> commentVOList = commentMapper.getCommentsByTopicID(topic.getId());
-                topic.setComments(commentVOList.size());
             }
         });
     }
