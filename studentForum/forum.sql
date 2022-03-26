@@ -87,37 +87,37 @@ INSERT INTO `bms_follow` VALUES (130, '1427303424550092802', '150645705820613427
 -- ----------------------------
 DROP TABLE IF EXISTS `bms_post`;
 CREATE TABLE `bms_post`  (
-  `id` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '主键',
-  `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '标题',
-  `content` longtext CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'markdown内容',
-  `user_id` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '作者ID',
-  `view` int NOT NULL DEFAULT 0 COMMENT '浏览统计',
-  `top` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否置顶，1-是，0-否',
-  `essence` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否加精，1-是，0-否',
-  `section_id` int NULL DEFAULT 0 COMMENT '专栏ID',
-  `is_audited` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否已审核，1-是，0-否',
-  `is_pass` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否通过，1-是，0-否',
-  `create_time` datetime NOT NULL COMMENT '发布时间',
-  `modify_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
-  INDEX `user_id`(`user_id`) USING BTREE,
-  INDEX `create_time`(`create_time`) USING BTREE
+`id` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '主键',
+`title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '标题',
+`content` longtext CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'markdown内容',
+`user_id` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '作者ID',
+`view` int NOT NULL DEFAULT 0 COMMENT '浏览统计',
+`top` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否置顶，1-是，0-否',
+`essence` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否加精，1-是，0-否',
+`section_id` int NULL DEFAULT 0 COMMENT '专栏ID',
+`is_audited` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否已审核，1-是，0-否',
+`is_pass` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否通过，1-是，0-否',
+`create_time` datetime NOT NULL COMMENT '发布时间',
+`modify_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
+INDEX `user_id`(`user_id`) USING BTREE,
+INDEX `create_time`(`create_time`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '话题表' ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of bms_post
 -- ----------------------------
-INSERT INTO `bms_post` VALUES ('1333447953558765569', '1', '12\n2\n\n', '1427303372125487106', 0, 0, 0, 77, b'1', b'1', 0, b'1', b'1', '2020-12-01 00:29:01', '2020-12-03 23:56:51');
-INSERT INTO `bms_post` VALUES ('1349362401438392322', '2021 健康，快乐', '2021的`FLAG`\n\n1. 技能进步\n2. 没有烦恼\n3. 发财 :smile:\n\n', '1427303372125487106', 0, 0, 0, 21, b'1', b'1', 0, b'1', b'1', '2021-01-13 22:27:21', '2021-01-14 17:30:13');
-INSERT INTO `bms_post` VALUES ('1334481725322297346', 'hello，spring-security', ':hibiscus: spring-security\n\n', '1427303372125487106', 0, 0, 0, 46, b'1', b'1', 0, b'1', b'1', '2020-12-03 20:56:51', NULL);
-INSERT INTO `bms_post` VALUES ('1332650453142827009', '哈哈哈，helloworld', '这是第一篇哦\n\n> hi :handshake: 你好\n\n`hello world`\n\n:+1: 很好\n', '1349290158897311745', 0, 0, 0, 29, b'1', b'1', 1, b'1', b'1', '2020-11-28 19:40:02', '2020-11-28 19:46:39');
-INSERT INTO `bms_post` VALUES ('1333432347031646209', '哈哈哈，换了个dark主题', '主题更换为Dark\n\n', '1349290158897311745', 0, 0, 0, 6, b'0', b'0', 0, b'1', b'1', '2020-11-30 23:27:00', NULL);
-INSERT INTO `bms_post` VALUES ('1333668258587750401', '嘿嘿，测试一下啊', '大家好\n`Hello everyone!`\n\n\n\n', '1427303424550092802', 0, 0, 0, 7, b'1', b'1', 0, b'1', b'1', '2020-12-01 15:04:26', '2020-12-01 16:49:14');
-INSERT INTO `bms_post` VALUES ('1332682473151635458', '我要发财', '2021 冲冲冲！！！\n\n', '1427303424550092802', 0, 0, 0, 94, b'1', b'1', 2, b'1', b'1', '2020-11-28 21:47:16', '2020-11-30 19:40:22');
-INSERT INTO `bms_post` VALUES ('1349631541260595202', '权限部分 OK', '1. 创建 ok\n2. 修改 ok\n3. 删除 ok\n\n', '1427305164020236289', 0, 0, 0, 17, b'1', b'1', 0, b'1', b'1', '2021-01-14 16:16:49', '2021-01-14 16:18:53');
-INSERT INTO `bms_post` VALUES ('1333676096156528641', '测试', '测试\n\n', '1427305164020236289', 0, 0, 0, 38, b'1', b'1', 0, b'1', b'1', '2020-12-01 15:35:34', NULL);
-INSERT INTO `bms_post` VALUES ('1332681213400817665', '聚合查询并统计', '* [x] SQL：\n\n```sql\nSELECT s.*,\nCOUNT(t.id) AS topics\nFROM section s\nLEFT JOIN topic t\nON s.id = t.section_id\nGROUP BY s.title\n```\n\n', '1427305164020236289', 0, 0, 0, 55, b'1', b'1', 1, b'1', b'1', '2020-11-28 21:42:16', '2020-11-29 15:00:42');
-INSERT INTO `bms_post` VALUES ('1335149981733449729', '视频嵌入', ':+1:\n\n[https://www.bilibili.com/video/BV1w64y1f7w3](https://www.bilibili.com/video/BV1w64y1f7w3)\n\n[1](https://www.bilibili.com/video/BV1tp4y1x72w)\n\n```\n.vditor-reset pre > code\n```\n\n```\npublic class HelloWorld {\n\npublic static void main(String[] args) {\n    System.out.println(\"Hello World!\");\n}\n}\n```\n\n', '1427303424550092802', 0, 0, 0, 41, b'1', b'1', 0, b'0', b'0', '2020-12-05 17:12:16', '2021-01-14 13:06:16');
-INSERT INTO `bms_post` VALUES ('1506457531038412801', '黄花1号帖子', '黄花11111', '1506457058206134273', 2, 1, 0, 0, b'1', b'1', 0, b'1', b'1', '2022-03-23 10:27:19', NULL);
+INSERT INTO `bms_post` VALUES ('1333447953558765569', '1', '12\n2\n\n', '1427303372125487106',77, b'1', b'1', 0, b'1', b'1', '2020-12-01 00:29:01', '2020-12-03 23:56:51');
+INSERT INTO `bms_post` VALUES ('1349362401438392322', '2021 健康，快乐', '2021的`FLAG`\n\n1. 技能进步\n2. 没有烦恼\n3. 发财 :smile:\n\n', '1427303372125487106', 21, b'1', b'1', 0, b'1', b'1', '2021-01-13 22:27:21', '2021-01-14 17:30:13');
+INSERT INTO `bms_post` VALUES ('1334481725322297346', 'hello，spring-security', ':hibiscus: spring-security\n\n', '1427303372125487106', 46, b'1', b'1', 0, b'1', b'1', '2020-12-03 20:56:51', NULL);
+INSERT INTO `bms_post` VALUES ('1332650453142827009', '哈哈哈，helloworld', '这是第一篇哦\n\n> hi :handshake: 你好\n\n`hello world`\n\n:+1: 很好\n', '1349290158897311745', 29, b'1', b'1', 1, b'1', b'1', '2020-11-28 19:40:02', '2020-11-28 19:46:39');
+INSERT INTO `bms_post` VALUES ('1333432347031646209', '哈哈哈，换了个dark主题', '主题更换为Dark\n\n', '1349290158897311745', 6, b'0', b'0', 0, b'1', b'1', '2020-11-30 23:27:00', NULL);
+INSERT INTO `bms_post` VALUES ('1333668258587750401', '嘿嘿，测试一下啊', '大家好\n`Hello everyone!`\n\n\n\n', '1427303424550092802', 7, b'1', b'1', 0, b'1', b'1', '2020-12-01 15:04:26', '2020-12-01 16:49:14');
+INSERT INTO `bms_post` VALUES ('1332682473151635458', '我要发财', '2021 冲冲冲！！！\n\n', '1427303424550092802',94, b'1', b'1', 2, b'1', b'1', '2020-11-28 21:47:16', '2020-11-30 19:40:22');
+INSERT INTO `bms_post` VALUES ('1349631541260595202', '权限部分 OK', '1. 创建 ok\n2. 修改 ok\n3. 删除 ok\n\n', '1427305164020236289',17, b'1', b'1', 0, b'1', b'1', '2021-01-14 16:16:49', '2021-01-14 16:18:53');
+INSERT INTO `bms_post` VALUES ('1333676096156528641', '测试', '测试\n\n', '1427305164020236289',38, b'1', b'1', 0, b'1', b'1', '2020-12-01 15:35:34', NULL);
+INSERT INTO `bms_post` VALUES ('1332681213400817665', '聚合查询并统计', '* [x] SQL：\n\n```sql\nSELECT s.*,\nCOUNT(t.id) AS topics\nFROM section s\nLEFT JOIN topic t\nON s.id = t.section_id\nGROUP BY s.title\n```\n\n', '1427305164020236289',  55, b'1', b'1', 1, b'1', b'1', '2020-11-28 21:42:16', '2020-11-29 15:00:42');
+INSERT INTO `bms_post` VALUES ('1335149981733449729', '视频嵌入', ':+1:\n\n[https://www.bilibili.com/video/BV1w64y1f7w3](https://www.bilibili.com/video/BV1w64y1f7w3)\n\n[1](https://www.bilibili.com/video/BV1tp4y1x72w)\n\n```\n.vditor-reset pre > code\n```\n\n```\npublic class HelloWorld {\n\npublic static void main(String[] args) {\n    System.out.println(\"Hello World!\");\n}\n}\n```\n\n', '1427303424550092802', 41, b'1', b'1', 0, b'0', b'0', '2020-12-05 17:12:16', '2021-01-14 13:06:16');
+INSERT INTO `bms_post` VALUES ('1506457531038412801', '黄花1号帖子', '黄花11111', '1506457058206134273', 0, b'1', b'1', 0, b'1', b'1', '2022-03-23 10:27:19', NULL);
 
 -- ----------------------------
 -- Table structure for bms_post_tag
