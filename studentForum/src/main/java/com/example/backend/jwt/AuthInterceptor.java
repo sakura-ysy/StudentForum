@@ -66,6 +66,8 @@ public class AuthInterceptor implements HandlerInterceptor {
                 if (loginRequired.allowTeacher() && authTeacher(user)) return true;
                 // 允许企业通过
                 if (loginRequired.allowCommon() && authCompany(user)) return true;
+                // 允许管理员通过
+                if (loginRequired.allowAdmin() && authAdmin(user)) return true;
                 sendJsonMessage(response,ROLE_FORBIDDEN);
                 return false;
             }
@@ -91,6 +93,11 @@ public class AuthInterceptor implements HandlerInterceptor {
     // 检验是否为企业
     private boolean authCompany(User user) throws ApiException {
         return user.getRole() == 3;
+    }
+
+    // 检验是否为管理员
+    private boolean authAdmin(User user) throws ApiException{
+        return user.getRole() == 0;
     }
 
     @Override

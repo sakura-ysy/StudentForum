@@ -1,5 +1,7 @@
 package com.example.backend.module.post.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -8,9 +10,7 @@ import com.example.backend.common.api.ErrorResponse;
 import com.example.backend.module.post.dto.CreateTopicDTO;
 import com.example.backend.module.post.entity.*;
 import com.example.backend.module.post.mapper.*;
-import com.example.backend.module.post.service.IPostService;
-import com.example.backend.module.post.service.ITagService;
-import com.example.backend.module.post.service.ITopicTagService;
+import com.example.backend.module.post.service.*;
 import com.example.backend.module.post.vo.CommentVO;
 import com.example.backend.module.post.vo.PostVO;
 import com.example.backend.module.user.entity.User;
@@ -47,6 +47,10 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
     private PostCollectMapper postCollectMapper;
     @Resource
     private CommentMapper commentMapper;
+    @Resource
+    private IPostPraiseService iPostPraiseService;
+    @Resource
+    private IPostCollectService iPostCollectService;
 
     @Autowired
     @Lazy
@@ -73,10 +77,6 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PostVO create(CreateTopicDTO dto, User user) {
-        // 查询帖子标题是否已存在
-        Post post1 = this.baseMapper.selectOne(new LambdaQueryWrapper<Post>().eq(Post::getTitle, dto.getTitle()));
-        Assert.isNull(post1, "话题已存在，请修改");
-
         // 创建帖子对象，封装
         Post post = Post.builder()
                 .userId(user.getId())
@@ -85,7 +85,7 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
                 .createTime(new Date())
                 .build();
         this.baseMapper.insert(post);  // 将该对象插入表单
-        post = this.getBaseMapper().selectOne(new LambdaQueryWrapper<Post>().eq(Post::getTitle, dto.getTitle()));
+        post = this.getBaseMapper().selectOne(new LambdaQueryWrapper<Post>().eq(Post::getId, post.getId()));
 
         // 插入标签
         for (String tag : dto.getTags()) {
@@ -122,7 +122,17 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
         this.baseMapper.updateById(topic);
         // emoji转码
         topic.setContent(EmojiParser.parseToUnicode(topic.getContent()));
-        map.put("topic", topic);
+        Map<String,Object> topicMap = JSONObject.parseObject(JSON.toJSONString(topic));
+
+        // 点赞、收藏、评论
+        List<PostPraise> praiseList = iPostPraiseService.getBaseMapper().selectList(new LambdaQueryWrapper<PostPraise>().eq(PostPraise::getPostId,topic.getId()));
+        topicMap.put("praises",praiseList.size());
+        List<PostCollect> collectList = iPostCollectService.getBaseMapper().selectList(new LambdaQueryWrapper<PostCollect>().eq(PostCollect::getPostId,topic.getId()));
+        topicMap.put("collects",collectList.size());
+        List<Comment> commentList = commentMapper.selectList(new LambdaQueryWrapper<Comment>().eq(Comment::getTopicId,topic.getId()));
+        topicMap.put("comments",commentList.size());
+
+        map.put("topic", topicMap);
         // 标签  找到帖子绑定的所有标签
         QueryWrapper<TopicTag> wrapper = new QueryWrapper<>();
         wrapper.lambda().eq(TopicTag::getTopicId, topic.getId());
@@ -213,6 +223,14 @@ public class IPostServiceImpl extends ServiceImpl<TopicMapper, Post> implements 
     public PostVO changePostToPostVO(Post post){
         PostVO postVO = new PostVO();
         BeanUtils.copyProperties(post,postVO);
+        // 点赞, 收藏, 评论数
+        List<PostPraise> praiseList = iPostPraiseService.getBaseMapper().selectList(new LambdaQueryWrapper<PostPraise>().eq(PostPraise::getPostId,post.getId()));
+        postVO.setPraises(praiseList.size());
+        List<PostCollect> collectList = iPostCollectService.getBaseMapper().selectList(new LambdaQueryWrapper<PostCollect>().eq(PostCollect::getPostId,post.getId()));
+        postVO.setCollects(collectList.size());
+        List<Comment> commentList = commentMapper.selectList(new LambdaQueryWrapper<Comment>().eq(Comment::getTopicId,post.getId()));
+        postVO.setComments(commentList.size());
+
         List<Tag> tags = new ArrayList<>();
         // 标签
         List<TopicTag> postTag = ITopicTagService.getBaseMapper().selectList(new LambdaQueryWrapper<TopicTag>().eq(TopicTag::getTopicId,post.getId()));

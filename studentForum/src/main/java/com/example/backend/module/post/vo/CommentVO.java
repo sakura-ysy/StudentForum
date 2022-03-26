@@ -14,7 +14,7 @@ public class CommentVO {
     private String id;
 
     /**
-     * 评论内容跟
+     * 评论内容
      */
     private String content;
 

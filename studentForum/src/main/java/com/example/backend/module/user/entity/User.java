@@ -73,6 +73,7 @@ public class User implements Serializable {
     @TableField("role_id")
     private Integer roleId;
 
+
     @TableField(value = "create_time", fill = FieldFill.INSERT)
     private Date createTime;
 

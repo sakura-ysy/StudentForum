@@ -13,9 +13,9 @@
 
     <select id="getCommentsByTopicID" resultMap="CommentVO">
         select *
-        from bms_comment
-        where (topic_id = #{topicid}) and (parent_comment_id is null) and(is_pass = true )
-        order by create_time desc
+        from bms_comment, ums_user
+        where (topic_id = #{topicid}) and (parent_comment_id is null) and(is_pass = true ) and(user_id = ums_user.id)
+        order by bms_comment.create_time desc
     </select>
 
 

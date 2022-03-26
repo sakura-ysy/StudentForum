@@ -51,8 +51,6 @@ public class IPostCollectServiceImpl extends ServiceImpl<PostCollectMapper, Post
                 .postId(postId)
                 .build();
         baseMapper.insert(addPostCollect);
-        // 帖子收藏数加一
-        post.setCollects(post.getCollects() + 1);
         topicMapper.updateById(post);
         return 1;
     }
@@ -76,8 +74,6 @@ public class IPostCollectServiceImpl extends ServiceImpl<PostCollectMapper, Post
             return 0;   // 还未收藏
         iPostCollectService.remove(new LambdaQueryWrapper<PostCollect>().eq(PostCollect::getPostId, postId)
                 .eq(PostCollect::getUserId, user.getId()));
-        // 帖子收藏数减一
-        post.setCollects(post.getCollects() - 1);
         topicMapper.updateById(post);
         return 1;  // 成功
     }

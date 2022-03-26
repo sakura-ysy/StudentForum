@@ -91,9 +91,6 @@ CREATE TABLE `bms_post`  (
   `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '标题',
   `content` longtext CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'markdown内容',
   `user_id` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '作者ID',
-  `comments` int NOT NULL DEFAULT 0 COMMENT '评论统计',
-  `collects` int NOT NULL DEFAULT 0 COMMENT '收藏统计',
-  `praises` int NOT NULL DEFAULT 0 COMMENT '点赞统计',
   `view` int NOT NULL DEFAULT 0 COMMENT '浏览统计',
   `top` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否置顶，1-是，0-否',
   `essence` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否加精，1-是，0-否',
@@ -102,7 +99,6 @@ CREATE TABLE `bms_post`  (
   `is_pass` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否通过，1-是，0-否',
   `create_time` datetime NOT NULL COMMENT '发布时间',
   `modify_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
-  UNIQUE INDEX `title`(`title`) USING BTREE,
   INDEX `user_id`(`user_id`) USING BTREE,
   INDEX `create_time`(`create_time`) USING BTREE
 ) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '话题表' ROW_FORMAT = DYNAMIC;
@@ -645,11 +641,11 @@ CREATE TABLE `ums_user`  (
 -- ----------------------------
 -- Records of ums_user
 -- ----------------------------
-INSERT INTO `ums_user` VALUES ('1349290158897311745', 'admin', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 1, 'https://s3.ax1x.com/2020/12/01/DfHNo4.jpg', 'admin@qq.com', 'U123456', NULL, 2, '', '自由职业者', b'1', b'1', 0, '2021-01-13 17:40:17', NULL);
-INSERT INTO `ums_user` VALUES ('1427303372125487106', 'huangdou', 'huangdou', 'e10adc3949ba59abbe56e057f20f883e', 4, 'https://s3.ax1x.com/2020/12/01/DfHNo4.jpg', 'huanggua@qq.com', NULL, '1234567', 0, '', '叽里呱啦', b'1', b'1', 1, '2021-10-19 12:52:43', NULL);
-INSERT INTO `ums_user` VALUES ('1427303424550092802', 'huanggua', 'huanggua', 'e10adc3949ba59abbe56e057f20f883e', 4, 'https://s3.ax1x.com/2020/12/01/DfHNo4.jpg', 'huanggua@qq.com', NULL, '123456', 0, '', '叽里呱啦', b'1', b'1', 1, '2021-10-19 12:52:43', NULL);
-INSERT INTO `ums_user` VALUES ('1427305164020236289', 'huangtao', 'huangtao', 'e10adc3949ba59abbe56e057f20f883e', 4, 'https://s3.ax1x.com/2020/12/01/DfHNo4.jpg', 'huanggua@qq.com', NULL, '1234567', 0, '', '叽里呱啦', b'1', b'1', 1, '2021-10-19 12:52:43', NULL);
-INSERT INTO `ums_user` VALUES ('1506457058206134273', 'huanghua', 'huanghua', 'e10adc3949ba59abbe56e057f20f883e', 4, 'https://s3.ax1x.com/2020/12/01/DfHNo4.jpg', 'huanghua@qq.com', NULL, '15560106663', 0, '', NULL, b'1', b'1', 1, '2022-03-23 10:25:26', NULL);
+INSERT INTO `ums_user` VALUES ('1349290158897311745', 'admin', 'admin', 'e10adc3949ba59abbe56e057f20f883e', 1, 'https://s3.ax1x.com/2020/12/01/DfHNo4.jpg', 'admin@qq.com', 'U123456', NULL, 50, '', '自由职业者', b'1', b'1', 0, '2021-01-13 17:40:17', NULL);
+INSERT INTO `ums_user` VALUES ('1427303372125487106', 'huangdou', 'huangdou', 'e10adc3949ba59abbe56e057f20f883e', 4, 'https://s3.ax1x.com/2020/12/01/DfHNo4.jpg', 'huanggua@qq.com', NULL, '1234567', 30, '', '叽里呱啦', b'1', b'1', 1, '2021-10-19 12:52:43', NULL);
+INSERT INTO `ums_user` VALUES ('1427303424550092802', 'huanggua', 'huanggua', 'e10adc3949ba59abbe56e057f20f883e', 4, 'https://s3.ax1x.com/2020/12/01/DfHNo4.jpg', 'huanggua@qq.com', NULL, '123456', 35, '', '叽里呱啦', b'1', b'1', 1, '2021-10-19 12:52:43', NULL);
+INSERT INTO `ums_user` VALUES ('1427305164020236289', 'huangtao', 'huangtao', 'e10adc3949ba59abbe56e057f20f883e', 4, 'https://s3.ax1x.com/2020/12/01/DfHNo4.jpg', 'huanggua@qq.com', NULL, '1234567', 40, '', '叽里呱啦', b'1', b'1', 1, '2021-10-19 12:52:43', NULL);
+INSERT INTO `ums_user` VALUES ('1506457058206134273', 'huanghua', 'huanghua', 'e10adc3949ba59abbe56e057f20f883e', 4, 'https://s3.ax1x.com/2020/12/01/DfHNo4.jpg', 'huanghua@qq.com', NULL, '15560106663', 45, '', NULL, b'1', b'1', 1, '2022-03-23 10:25:26', NULL);
 
 -- ----------------------------
 -- Table structure for user_role
@@ -671,3 +667,56 @@ INSERT INTO `user_role` VALUES ('1', '1349290158897311745', '0');
 INSERT INTO `user_role` VALUES ('1450324004080381955', '1450324004080381953', '1');
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ----------------------------
+-- Table structure for question
+-- ----------------------------
+DROP TABLE IF EXISTS `question`;
+CREATE TABLE `question`  (
+`id` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '主键',
+`title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '标题',
+`content` longtext CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'markdown内容',
+`user_id` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '作者ID',
+`reward` int NOT NULL DEFAULT 0 COMMENT '赏金',
+`ans_num` int NOT NULL DEFAULT 0 COMMENT '回答数',
+`view` int NOT NULL DEFAULT 0 COMMENT '浏览统计',
+`is_solved` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否已经解决，1-是，0-否',
+`is_canceled` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否被撤销，1-是，0-否',
+`is_audited` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否已审核，1-是，0-否',
+`is_pass` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否通过，1-是，0-否',
+`create_time` datetime NOT NULL COMMENT '发布时间',
+`modify_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
+INDEX `user_id`(`user_id`) USING BTREE,
+INDEX `create_time`(`create_time`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '问题表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of question
+-- ----------------------------
+INSERT INTO `question` VALUES ('1507006107998052353', 'test1', '刘备为什么扛起RPG?','1427303372125487106',6,0,0,0,0,1,1,'2021-01-13 17:40:17','2021-01-13 17:40:17');
+INSERT INTO `question` VALUES ('1507562785629872129', 'test2', '陈睿为什么要摸电线?','1427303424550092802',10,1,0,0,0,1,1,'2021-01-13 17:40:17','2021-01-13 17:40:17');
+
+-- ----------------------------
+-- Table structure for answer
+-- ----------------------------
+DROP TABLE IF EXISTS `answer`;
+CREATE TABLE `answer`  (
+`id` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '主键',
+`content` longtext CHARACTER SET utf8 COLLATE utf8_general_ci NULL COMMENT 'markdown内容',
+`user_id` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '作者ID',
+`question_id` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '所处问题的id',
+`reply_to_id` varchar(20) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '评论的回答id',
+`is_adopted` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否已经解决，1-是，0-否',
+`is_audited` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否已审核，1-是，0-否',
+`is_pass` bit(1) NOT NULL DEFAULT b'0' COMMENT '是否通过，1-是，0-否',
+`create_time` datetime NOT NULL COMMENT '发布时间',
+`modify_time` datetime NULL DEFAULT NULL COMMENT '修改时间',
+INDEX `user_id`(`user_id`) USING BTREE,
+INDEX `create_time`(`create_time`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci COMMENT = '回答表' ROW_FORMAT = DYNAMIC;
+
+-- ----------------------------
+-- Records of answer
+-- ----------------------------
+INSERT INTO `answer` VALUES ('1507380780434833409', '输麻了', '1349290158897311745','1507006107998052353',null,0,1,1,'2021-01-13 17:40:17','2021-01-13 17:40:17');
+INSERT INTO `answer` VALUES ('1507549574302011394', '哈哈哈', '1349290158897311745','1507006107998052353','1507380780434833409',0,1,1,'2021-01-13 17:40:17','2021-01-13 17:40:17');

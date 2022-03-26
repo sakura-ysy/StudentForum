@@ -1,8 +1,6 @@
-package com.example.backend.module.post.entity;
+package com.example.backend.module.question.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,18 +12,18 @@ import java.util.Date;
 
 @Data
 @Builder
-@TableName("bms_post")
+@TableName("question")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Post implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Question implements Serializable {
+    private static final long serialVersionUID = 1385367477277247968L;
 
     /**
      * 主键
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private String id;
+
     /**
      * 标题
      */
@@ -45,6 +43,12 @@ public class Post implements Serializable {
     @TableField("user_id")
     private String userId;
 
+    /**
+     * 赏金
+     */
+    @Builder.Default
+    @TableField("reward")
+    private Integer reward = 0;
 
     /**
      * 浏览数
@@ -54,25 +58,22 @@ public class Post implements Serializable {
     private Integer view = 0;
 
     /**
-     * 专栏ID，默认不分栏
+     * 回答数
      */
-    @TableField("section_id")
+    @TableField("ans_num")
     @Builder.Default
-    private Integer sectionId = 0;
+    private Integer ansNum = 0;
 
     /**
-     * 置顶
+     * 是否已经采纳答案
      */
-    @TableField("top")
+    @TableField("is_solved")
     @Builder.Default
-    private Boolean top = false;
+    private Boolean isSolved = false;
 
-    /**
-     * 加精
-     */
-    @TableField("essence")
+    @TableField("is_canceled")
     @Builder.Default
-    private Boolean essence = false;
+    private Boolean isCanceled = false;
 
     /**
      * 是否已审核
@@ -88,7 +89,6 @@ public class Post implements Serializable {
     @Builder.Default
     private Boolean isPass = true;
 
-
     /**
      * 创建时间
      */
@@ -100,11 +100,4 @@ public class Post implements Serializable {
      */
     @TableField(value = "modify_time", fill = FieldFill.UPDATE)
     private Date modifyTime;
-
-    /**
-     *
-     */
-    //@TableField(value = "tags")
-    //private String tags;
 }
-

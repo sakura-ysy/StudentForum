@@ -5,6 +5,7 @@
     <resultMap id="notify" type="com.example.backend.module.notify.entity.Notify">
         <id column="id" property="id"/>
         <result column="content" property="content"/>
+        <result column="notifier" property="notifier"/>
         <result column="user_id" property="userId"/>
         <result column="from_id" property="fromId"/>
         <result column="action" property="action"/>

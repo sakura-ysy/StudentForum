@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.backend.module.question.mapper.QuestionMapper">
+    <resultMap id="question" type="com.example.backend.module.question.entity.Question">
+        <id column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="user_id" property="userId"/>
+        <result column="content" property="content"/>
+        <result column="ans_num" property="ansNum"/>
+        <result column="view" property="view"/>
+        <result column="reward" property="reward"/>
+        <result column="username" property="username"/>
+        <result column="is_solved" property="isSolved"/>
+        <result column="is_canceled" property="isCanceled"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modify_time" property="modifyTime"/>
+        <result column="is_pass" property="isPass"/>
+        <result column="is_audited" property="isAudited"/>
+    </resultMap>
+
+    <select id="selectQuestionPage" resultMap="question">
+        SELECT
+        t.id, t.title, t.content, t.user_id,
+        t.ans_num, t.view, t.is_solved, t.is_audited,
+        t.is_pass, t.create_time, t.modify_time,t.reward, t.is_canceled
+        FROM question t
+        <where>
+            t.is_pass = true and t.is_canceled = false
+            <if test="tab == 'hot'">
+                and date(t.create_time) &lt;= date_add(curdate(), interval 1 day)
+                and date(t.create_time) &gt;= date_sub(curdate(), interval 7 day)
+            </if>
+        </where>
+        <if test="tab != 'hot'">
+            order by t.create_time desc
+        </if>
+        <if test="tab == 'hot'">
+            order by t.view desc, t.create_time desc
+        </if>
+    </select>
+
+</mapper>

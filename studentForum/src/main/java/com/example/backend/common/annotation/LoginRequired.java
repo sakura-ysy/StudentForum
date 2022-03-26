@@ -19,4 +19,6 @@ public @interface LoginRequired {
     boolean allowTeacher() default false;  // 允许教师访问
 
     boolean allowCompany() default false;  // 允许企业访问
+
+    boolean allowAdmin() default false;  // 允许管理员访问
 }

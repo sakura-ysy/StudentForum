@@ -1,8 +1,6 @@
-package com.example.backend.module.post.entity;
+package com.example.backend.module.question.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,65 +12,51 @@ import java.util.Date;
 
 @Data
 @Builder
-@TableName("bms_post")
+@TableName("answer")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Post implements Serializable {
+public class Answer implements Serializable {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -3533960612472130198L;
 
     /**
      * 主键
      */
     @TableId(value = "id", type = IdType.ASSIGN_ID)
     private String id;
+
     /**
-     * 标题
+     * 用户id
      */
-    @NotBlank(message = "标题不可以为空")
-    @TableField(value = "title")
-    private String title;
+    @TableField(value = "user_id")
+    private String userId;
+
     /**
-     * markdown
+     * 内容
      */
-    @NotBlank(message = "内容不可以为空")
+    @NotBlank(message = "内容不可为空")
     @TableField("`content`")
     private String content;
 
     /**
-     * 作者ID
+     * 所处的问题id
      */
-    @TableField("user_id")
-    private String userId;
-
-
-    /**
-     * 浏览数
-     */
-    @TableField("view")
-    @Builder.Default
-    private Integer view = 0;
+    @TableField(value = "question_id")
+    private String questionId;
 
     /**
-     * 专栏ID，默认不分栏
+     * 评论的回答id
      */
-    @TableField("section_id")
+    @TableField(value = "reply_to_id")
     @Builder.Default
-    private Integer sectionId = 0;
+    private String replyToId = null;  // 一级为空
 
     /**
-     * 置顶
+     * 是否被采纳
      */
-    @TableField("top")
+    @TableField(value = "is_adopted")
     @Builder.Default
-    private Boolean top = false;
-
-    /**
-     * 加精
-     */
-    @TableField("essence")
-    @Builder.Default
-    private Boolean essence = false;
+    private Boolean isAdopted = false;
 
     /**
      * 是否已审核
@@ -100,11 +84,4 @@ public class Post implements Serializable {
      */
     @TableField(value = "modify_time", fill = FieldFill.UPDATE)
     private Date modifyTime;
-
-    /**
-     *
-     */
-    //@TableField(value = "tags")
-    //private String tags;
 }
-

@@ -50,9 +50,6 @@ public class IPostPraiseServiceImpl extends ServiceImpl<PostPraiseMapper, PostPr
                 .postId(postId)
                 .build();
         baseMapper.insert(addPostPraise);
-
-        post.setPraises(post.getPraises() + 1);
-        topicMapper.updateById(post);
         return 1;     // 成功
     }
 
@@ -75,7 +72,6 @@ public class IPostPraiseServiceImpl extends ServiceImpl<PostPraiseMapper, PostPr
             return 0;   // 还未点赞
         iPostPraiseService.remove(new LambdaQueryWrapper<PostPraise>().eq(PostPraise::getPostId, postId)
                 .eq(PostPraise::getUserId, user.getId()));
-        post.setPraises(post.getPraises() + 1);
         topicMapper.updateById(post);
         return 1;  // 成功
     }

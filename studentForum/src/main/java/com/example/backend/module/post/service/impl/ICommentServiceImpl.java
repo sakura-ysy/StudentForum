@@ -75,7 +75,6 @@ public class ICommentServiceImpl extends ServiceImpl<CommentMapper, Comment> imp
         this.baseMapper.insert(comment);
         // 帖子评论数加1
         Post post = iPostService.getById(dto.getPostId());
-        post.setComments(post.getComments() + 1);
         iPostService.updateById(post);
         return comment;
     }
@@ -97,7 +96,6 @@ public class ICommentServiceImpl extends ServiceImpl<CommentMapper, Comment> imp
         this.baseMapper.insert(comment);
         // 帖子评论数加1
         Post post = iPostService.getById(dto.getPostId());
-        post.setComments(post.getComments() + 1);
         iPostService.updateById(post);
         return comment;
     }
