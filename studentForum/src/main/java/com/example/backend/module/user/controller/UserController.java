@@ -8,6 +8,7 @@ import com.example.backend.common.api.ApiResult;
 import com.example.backend.jwt.AuthInterceptor;
 import com.example.backend.jwt.JwtUtils;
 import com.example.backend.module.post.vo.PostVO;
+import com.example.backend.module.user.entity.UserGitLab;
 import com.example.backend.module.user.entity.UserRole;
 import com.example.backend.module.post.entity.Post;
 import com.example.backend.module.post.entity.PostCollect;
@@ -18,6 +19,7 @@ import com.example.backend.module.user.dto.LoginDTO;
 import com.example.backend.module.user.dto.RegisterDTO;
 import com.example.backend.module.user.entity.User;
 import com.example.backend.module.user.mapper.UserMapper;
+import com.example.backend.module.user.service.IUserGitLabService;
 import com.example.backend.module.user.service.IUserService;
 import com.example.backend.module.user.vo.ProfileVO;
 import com.example.backend.utils.MD5Utils;
@@ -58,6 +60,8 @@ public class UserController {
     private IUserService iUserService;
     @Resource
     private IPostService iPostService;
+    @Resource
+    private IUserGitLabService iUserGitLabService;
     @Resource
     private UserController userController;
 
@@ -331,5 +335,38 @@ public class UserController {
         }
         return ApiResult.success(iUserService.getUserProfile(user.getId()));
     }
+
+    /**
+     * 绑定GitLab用户名
+     * @return
+     */
+    @ApiOperation("绑定GitLab用户名")
+    @LoginRequired(allowAll = true)
+    @PostMapping(value = "/bindGitLab")
+    public ApiResult<UserGitLab> bindGitLabUsername(
+            @ApiParam("传入GitLab用户名")@RequestBody String gitLabUsername
+    ) {
+        User user = AuthInterceptor.getCurrentUser();
+        return ApiResult.success(iUserGitLabService.bindGitLabUsername(user, gitLabUsername));
+    }
+
+    @ApiOperation("解绑GitLab用户名")
+    @LoginRequired(allowAll = true)
+    @PostMapping(value = "/unbbindGitLab")
+    public ApiResult<Object> unbindGitLabUsername() {
+        User user = AuthInterceptor.getCurrentUser();
+        String gitLabUsername = iUserGitLabService.getGitLabUsernameByUser(user);
+        if (gitLabUsername == null) {
+            return ApiResult.failed("未绑定");
+        }
+        if (iUserGitLabService.unbindGitLabUsername(user)) {
+            return ApiResult.success("解绑成功");
+        }
+        else {
+            return ApiResult.failed("解绑失败");
+        }
+    }
+
+
 
 }

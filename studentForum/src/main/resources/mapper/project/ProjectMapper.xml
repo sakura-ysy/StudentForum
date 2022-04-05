@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.backend.module.project.mapper.ProjectMapper">
+    <resultMap id="project" type="com.example.backend.module.project.entity.Project">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="description" property="description"/>
+        <result column="stars" property="ansNum"/>
+        <result column="forks" property="view"/>
+        <result column="latest_message" property="latestMessage"/>
+        <result column="is_audited" property="isAudited"/>
+        <result column="is_pass" property="isPass"/>
+        <result column="create_time" property="createTime"/>
+        <result column="modify_time" property="modifyTime"/>
+    </resultMap>
+
+    <select id="selectProjectPage" resultMap="project">
+        SELECT
+               t.id, t.name, t.description, t.stars, t.forks, t.latest_message,
+               t.is_audited, t.is_pass, t.create_time, t.modify_time
+        FROM project t
+        <where>
+            t.is_pass = true
+            <if test="tab == 'hot'">
+                and date(t.create_time) &lt;= date_add(curdate(), interval 1 day)
+                and date(t.create_time) &gt;= date_sub(curdate(), interval 7 day)
+            </if>
+        </where>
+        <if test="tab != 'hot'">
+            order by t.create_time desc
+        </if>
+        <if test="tab == 'hot'">
+            order by t.view desc, t.create_time desc
+        </if>
+    </select>
+
+</mapper>

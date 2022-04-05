@@ -223,6 +223,9 @@ public class IQuestionServiceImpl extends ServiceImpl<QuestionMapper, Question> 
         User answerUser = iUserService.getById(answer.getUserId());
         answerUser.setScore(answerUser.getScore() + question.getReward());
         iUserService.updateById(answerUser);
+        question.setIsSolved(true);
+        question.setModifyTime(new Date());
+        this.updateById(question);
         return iAnswerService.changeAnswerToAnswerVO(answer);
     }
 
